@@ -13,17 +13,12 @@
   - [ ] Github -> *Create this repository!* 
   - [ ] TA (teaching material, demo code, ppt)
 
-## Ouline for this project
-1. Revise the experiments performed in lecture
-2. Create automatic processing tools
-3. Play around with computer vision tools in "OpenCV"
-   - comon filter
-   - color transform
-   - resize, augmentation
-
-## Workflow
+## Project Workflow
 1. Collect data and necessary environment setting (temp.)
 2. Preprocesisng
    - Convert to animation -> find the trend of particles movement
    - Track -> Normal Cross Correlaiton
-   - Gaussian filter
+3. Play around with computer vision tools in "OpenCV"
+   - Common filter
+   - Color transform
+   - Resize, Augmentation
