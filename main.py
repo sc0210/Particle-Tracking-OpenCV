@@ -1,14 +1,29 @@
 from utils import Toolkits
-import glob, numpy as np
+import glob,os, numpy as np
 import matplotlib.pyplot as plt
 from tqdm import trange
+from functools import partial
+
+def makefolders(root_dir, subfolders):
+    concat_path = partial(os.path.join, root_dir)
+    for subfolder in map(concat_path, subfolders):
+        os.makedirs(subfolder, exist_ok=True)  # Python 3.2+
 
 if "__name__" == "__main__":
-    ## Folder Path
+    #----------------------ROOT folder setup---------------------#
     Root1 = "./Brownian_motion"
     Root2 = "./Export"
     
-    #----------------------Convert to animationn---------------------#
+    #----------------------Envs folder setup---------------------#
+    # Create folder "TrackFile"
+    root_dir = './Export/TrackFile'
+    subfolders = ('1', '2', '3', '4', '5','Free','Laser') # Named after group
+    makefolders(root_dir,subfolders)
+    
+    # Create folde "RawData"
+    os.mkdir("./Export/RawData")
+
+    #----------------------Convert to animation---------------------#
     # Convert sequenes of images(.tif) into animantion(.mp4) -/RawData
     Toolkits.TIF2AVI(InFolder=f"{Root1}/Laser", OutFolder=Root2, OutName='Laser', FPS=5)
     Toolkits.TIF2AVI(InFolder=f"{Root1}/Free", OutFolder=Root2, OutName='Free', FPS=5)
