@@ -8,7 +8,8 @@
 4. Execute main program `python main.py`
 5. Check up the result in `./Export`
 
-## Check (to-do) list  <sub>***(last updated 8/22***)</sub>
+## Check (to-do) list  
+***(last updated 8/22***)
 - [ ] Part 1 Develop tools with funcitons listed bellow 
   - [x] Read several types(tif, jpg, png) of image `ReadGrayImg(RscPath, show=False)`
   - [x] Convert sequences of images into animation `TIF2AVI(InFolder,OutFolder="./Export",OutName="test",FPS=5)`
@@ -18,16 +19,9 @@
   - `Track(SrcFolder, OutFoldName="test" ,SavePlot=True)`
   - [ ] Coefficient of viscosity
   - [ ] Graph the in XY cororidnated system
+  
 - [ ] Part 2 Organized and record the process
   - [ ] Github -> *Create this repository!* 
   - [ ] TA (teaching material, demo code, ppt)
 
-## Project Workflow
-1. Collect data and necessary environment setting (temp.)
-2. Preprocesisng
-   - Convert to animation -> find the trend of particles movement
-   - Track -> Normal Cross Correlaiton
-3. Play around with computer vision tools in "OpenCV"
-   - Common filter
-   - Color transform
-   - Resize, Augmentation
+## References 
