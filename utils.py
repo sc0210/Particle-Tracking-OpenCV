@@ -7,7 +7,7 @@ from scipy.signal import fftconvolve
 
 
 class Toolkits:
-    def ReadGrayImg(RscPath, show):
+    def ReadGrayImg(RscPath, show=False):
         """
         Read an image.
         
@@ -20,7 +20,7 @@ class Toolkits:
             Img.show()
         return Img
 
-    def TIF2AVI(InFolder,OutFolder,OutName,FPS):
+    def TIF2AVI(InFolder,OutFolder="./Export",OutName="test",FPS=5):
         """
         Convert sequential TIFs images into AVI clip format.
         
