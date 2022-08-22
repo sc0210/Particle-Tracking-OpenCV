@@ -4,9 +4,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
 from scipy.signal import fftconvolve
+from functools import partial
+
 
 
 class Toolkits:
+    def makefolders(root_dir, subfolders):
+        concat_path = partial(os.path.join, root_dir)
+        for subfolder in map(concat_path, subfolders):
+            os.makedirs(subfolder, exist_ok=True)  # Python 3.2+
+
     def ReadGrayImg(RscPath, show=False):
         """
         Read an image.
@@ -152,7 +159,8 @@ class Toolkits:
         output = cv2.cvtColor(template, cv2.COLOR_GRAY2BGR)
         blur = cv2.medianBlur(template,5)  
         circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT,1,20,param1=50,param2=10,minRadius=3,maxRadius=20)
-        
+        print("////"*18)
+        print(f"Currenet analysis image: {OutFoldName}")
         if circles is not None:
             # Get the (x, y, r) as integers
             circles = np.uint16(np.around(circles))
@@ -172,14 +180,14 @@ class Toolkits:
                 Corr[5]=i[1] # center Y
                 Corr[5]=i[2] # circle radius
 
-                print(f"CenterX:{i[0]}, CenterY:{i[1]}, x1:{x1}, y1:{y1}, x2:{x2}, y2:{y2}, radius:{i[2]}")
+                print(f"(CenterX,CenterY):({i[0]},{i[1]}), (x1,y1):({x1},{y1}), (x2,y2):({x2},{y2}), radius:{i[2]}")
 
         
-        cv2.imwrite("ROI.jpeg",output)
+        cv2.imwrite(f"./Export/TrackFile/ROI/{OutFoldName}_ROI.jpeg",output)
         roi = template.copy()
         cv2.circle(roi,(Corr[4],Corr[5]),Corr[6],(255, 0, 0),-1)
         roi = np.asarray(roi)[Corr[1]:Corr[3], Corr[0]:Corr[2]] #26:44,18:34]# opposite input seleciton
-        #roi = cv2.GaussianBlur(roi,(7,7),0)  
+        roi = cv2.GaussianBlur(roi,(5,5),0)  
         #roi = Toolkits.xdog_garygrossi(roi,sigma=0.5,k=200, gamma=0.98,epsilon=0.1,phi=10)
 
         #---------NormalXCorr--------------------------------------------------------------------------------
@@ -216,6 +224,6 @@ class Toolkits:
                 plt.cla()
                 plt.close(fig)
                 
-        print(f"image shape:{imarray1.shape}, ROI:{roi.shape}")
+        print(f"image shape:{imarray1.shape}, ROI:{roi.shape}\n")
                 
         return list_x, list_y
