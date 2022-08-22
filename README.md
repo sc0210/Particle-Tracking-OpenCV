@@ -1,6 +1,10 @@
 # Particle-Tracking
 > This project is inspired by a lecture (Brownian-motion-exp.) in school. The main goal of this project is to extend self-learning programing skill and provide more convenient tools to optimized the postprocessing. Looking forward to share with junior students! 
 
+## Result
+![free1_0100.png](./Export/TrackFile/Free/free1_0100.png)![free1_0100.png](./Export/TrackFile/Laser/laser1_0040.png)
+
+
 ## How to apply this tool at local machine (Steps by steps)
 1. Clone this repository to your folder via `git clone https://github.com/samchen0210/Particle-Tracking.git`
 2. Install package used this project via `pip install -r requirements`
