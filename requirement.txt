@@ -1,0 +1,9 @@
+##### Core scientific packages
+#jupyter
+matplotlib
+numpy
+#pandas
+scipy
+
+##### Image manipulation
+Pillow
