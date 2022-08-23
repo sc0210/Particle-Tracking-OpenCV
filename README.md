@@ -7,11 +7,12 @@
 
 
 ## Steps to follow
-1. Clone this repository to your folder via `git clone https://github.com/samchen0210/Particle-Tracking.git`
-2. Install package used this project via `pip install -r requirements`
-3. Organize input data (tif images) by group and store in respective folder `folder name list = ['1', '2', '3', '4', '5','Free','Laser']`
-4. Execute main program in terminal via `python main.py`
-5. Check up the result in `./Export`
+1. Clone this repository to your folder via `git clone https://github.com/samchen0210/Particle-Tracking-python-OpenCV.git`
+2. Type  `cd Particle-Tracking` to move current working directory into the folder.
+3. Install package used this project via typing`pip install -r requirements` in the terminal.
+4. Organize input data (tif images) by group and store in respective folder `folder name list = ['1', '2', '3', '4', '5','Free','Laser']`
+5. Execute main program via typing`python main.py` in the terminal with data store in the same path.
+6. Check up the result in `./Export`
 
 ## Check (to-do) list  
 ***(last updated 8/22***)
