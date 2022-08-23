@@ -29,13 +29,13 @@ for index in groups:
     Track(SrcFolder, OutFolder, OutName=f"{index}", SavePlot=True)
 
 #----------------------Convert to animationn---------------------#
-# Convert sequenes of images(.jpg) into animantion(.mp4) -/TrackFile
+# Convert sequenes of images(.jpg) into animantion(.mp4/.gif) -/TrackFile
 print(f"\nConverting into animation...")
 for index in groups:
     SrcFolder=f"{Root2}/TrackFile/{index}"
     OutFolder=f"{Root2}/TrackFile"
     IMG2MP4(SrcFolder, OutFolder, OutName=f'Track_{index}', FPS=5)
-    PNG2GIF(SrcFolder, OutFolder,OutName=f"Track_{index}",ImgFormat="png", duration=120)
+    PNG2GIF(SrcFolder, OutFolder, OutName=f"Track_{index}",ImgFormat="png", duration=120)
 
 print("////"*18)
 print(f"\nThis is the end of analysis! Check results in './Export'")

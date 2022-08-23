@@ -11,15 +11,15 @@ def makefolders(root_dir, subfolders):
     for subfolder in map(concat_path, subfolders):
         os.makedirs(subfolder, exist_ok=True)  # Python 3.2+
 
-def ReadGrayImg(RscPath, show=False):
+def ReadGrayImg(SrcPath, show=False):
     """
     Read an image.
         
     Args:
-        RscPath:(str)image path
+        SrcPath:(str)image path
         show:(bool)show the image on the screen
     """
-    Img = cv2.imread(RscPath,0)
+    Img = cv2.imread(SrcPath,0)
     if show ==True:
         Img.show()
     return Img
