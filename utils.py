@@ -6,8 +6,6 @@ from scipy import signal
 from scipy.signal import fftconvolve
 from functools import partial
 
-
-
 class Toolkits:
     def makefolders(root_dir, subfolders):
         concat_path = partial(os.path.join, root_dir)
