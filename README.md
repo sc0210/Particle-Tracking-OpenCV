@@ -10,7 +10,7 @@
 1. Clone this repository to your folder via `git clone https://github.com/samchen0210/Particle-Tracking.git`
 2. Install package used this project via `pip install -r requirements`
 3. Organize input data (tif images) by group and store in respective folder 
-    - `folder name list = ['1', '2', '3', '4', '5','Free','Laser']`
+  - `folder name list = ['1', '2', '3', '4', '5','Free','Laser']`
 4. Execute main program via `python main.py`
 5. Check up the result in `./Export`
 
