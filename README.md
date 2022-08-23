@@ -2,7 +2,8 @@
 > This project is inspired by a lecture (Brownian-motion-exp.) in school. The main goal of this project is to extend self-learning programing skill and provide more convenient tools to optimized the postprocessing. Looking forward to share with junior students! 
 
 ## Result
-![free1_0100.png](./Export/TrackFile/Free/Track_Free.gif)![free1_0100.png](./Export/TrackFile/Laser/Track_Laser.gif)
+![free1_0100.png](./Export/TrackFile/Track_Free.gif)
+![free1_0100.png](./Export/TrackFile/Laser/Track_Laser.gif)
 
 
 ## Steps to 
