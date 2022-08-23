@@ -1,17 +1,16 @@
-# Particle-Tracking
+# Particle-Tracking-python-OpenCV
 > This project is inspired by a lecture (Brownian-motion-exp.) in school. The main goal of this project is to extend self-learning programing skill and provide more convenient tools to optimized the postprocessing. Looking forward to share with junior students! 
 
-## Result
+## Sample result
 ![free1_0100.png](./Export/TrackFile/Track_Free.gif)
 ![free1_0100.png](./Export/TrackFile/Track_Laser.gif)
 
 
-## Steps to 
+## Steps to follow
 1. Clone this repository to your folder via `git clone https://github.com/samchen0210/Particle-Tracking.git`
 2. Install package used this project via `pip install -r requirements`
-3. Organize input data (tif images) by group and store in respective folder 
-  - `folder name list = ['1', '2', '3', '4', '5','Free','Laser']`
-4. Execute main program via `python main.py`
+3. Organize input data (tif images) by group and store in respective folder `folder name list = ['1', '2', '3', '4', '5','Free','Laser']`
+4. Execute main program in terminal via `python main.py`
 5. Check up the result in `./Export`
 
 ## Check (to-do) list  
