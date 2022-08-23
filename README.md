@@ -3,7 +3,7 @@
 
 ## Result
 ![free1_0100.png](./Export/TrackFile/Track_Free.gif)
-![free1_0100.png](./Export/TrackFile/Laser/Track_Laser.gif)
+![free1_0100.png](./Export/TrackFile/Track_Laser.gif)
 
 
 ## Steps to 
