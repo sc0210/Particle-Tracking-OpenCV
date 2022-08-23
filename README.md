@@ -17,7 +17,8 @@
 ## Check (to-do) list  
 ***(last updated 8/22***)
 - [ ] Part 1 Develop tools with funcitons listed bellow 
-  - [x] Read several types(tif, jpg, png) of image `ReadGrayImg(RscPath, show=False)`
+  - [x] Read several types(tif, jpg, png) of image
+  - `ReadGrayImg(RscPath, show=False)`
   - [x] Convert sequences of images into animation 
   - `IMG2MP4(SrcFolder,OutFolder,OutName,FPS=5)`
   - `PNG2GIF(SrcFolder,OutFolder,OutName,ImgFormat="png", duration=120)`
