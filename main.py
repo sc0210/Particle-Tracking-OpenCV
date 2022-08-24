@@ -24,7 +24,7 @@ for index in groups:
     #IMG2MP4(SrcFolder, OutFolder, OutName=f'{index}', FPS=5)
 
 #-Step2:Track through ROI------------------------# 
-for index in groups:
+for index in groups[:]:
     SrcFolder=f"./Brownian_motion/{index}"
     OutFolder=f"{Root2}/TrackFile"
     X,Y = Track(SrcFolder, OutFolder, OutName=f"{index}", SavePlot=True)

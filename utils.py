@@ -155,13 +155,13 @@ def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
     list_x ,list_y = [],[]
 
     #---------ROI section--------------------------------------------------------------------------------
-    FileNumber = len(os.listdir(SrcFolder))
-    ROI_INDEX = np.random.randint(0,FileNumber)
+    ROI_INDEX = np.random.randint(0, len(os.listdir(SrcFolder)))
 
     template = ReadGrayImg(f"{SrcFolder}/{sorted(os.listdir(SrcFolder))[ROI_INDEX]}", False)        
     output = cv2.cvtColor(template, cv2.COLOR_GRAY2BGR)
-    blur = cv2.medianBlur(template,5)  
-    circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT,1,20,param1=50,param2=10,minRadius=5,maxRadius=23)
+    blur = cv2.medianBlur(template,3)  
+    #blur = cv2.GaussianBlur(template,(7,7),0)
+    circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT,1,20,param1=50,param2=20,minRadius=5,maxRadius=25)
     print("////"*18)
     print(f"Currenet analysis image: {OutName}")
     if circles is not None:
@@ -182,29 +182,27 @@ def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
             Corr[4]=i[0] # center X
             Corr[5]=i[1] # center Y
             Corr[5]=i[2] # circle radius
+            cv2.imwrite(f"./Export/TrackFile/ROI/{OutName}_ROI.png",output)
 
             print(f"CenterX,CenterY:({i[0]},{i[1]}); radius:{i[2]}; x1,y1:({x1},{y1}), (x2,y2):({x2},{y2})")
     else:
         print("There is no circles in the picture! Please check~")  
         
-    cv2.imwrite(f"./Export/TrackFile/ROI/{OutName}_ROI.png",output)
+    
     roi = template.copy()
     cv2.circle(roi,(Corr[4],Corr[5]),Corr[6],(255, 0, 0),-1)
-    roi_initial = np.asarray(roi)[Corr[1]:Corr[3], Corr[0]:Corr[2]] #26:44,18:34]# opposite input seleciton
-    roi = cv2.GaussianBlur(roi_initial,(3,3),0)  
-    roi = xdog_garygrossi(roi,sigma=0.5,k=200, gamma=0.98,epsilon=0.1,phi=10)
+    roi_initial = np.asarray(roi[Corr[1]:Corr[3], Corr[0]:Corr[2]]) #26:44,18:34]# opposite input seleciton
+    #roi = cv2.GaussianBlur(roi_initial,(3,3),0)  
+    #roi = xdog_garygrossi(roi,sigma=0.5,k=200, gamma=0.98,epsilon=0.1,phi=10)
     #cv2.imwrite(f"./Export/TrackFile/ROI/ROI_{OutName}.png",roi)
 
     #---------NormalXCorr--------------------------------------------------------------------------------
     for filename in sorted(os.listdir(SrcFolder)):
         #num1, num2 = str(index).zfill(4), str(index+1).zfill(4)
         image = ReadGrayImg(f"{SrcFolder}/{filename}", False)
-        imarray1 = np.asarray(image)
-        imarray1 = cv2.GaussianBlur(imarray1,(3,3),0)
-        #kernel = np.ones((3,3), np.uint8)
-        #imarray1 = cv2.erode(imarray1, kernel, iterations = 1)
-        #imarray1 = cv2.dilate(imarray1, kernel, iterations = 1)
-        imarray1 = xdog_garygrossi(imarray1,sigma=0.5,k=200, gamma=0.98,epsilon=0.1,phi=10)
+        imarray1 = cv2.medianBlur(image,5)
+        imarray1 = np.asarray(imarray1)
+        #imarray1 = xdog_garygrossi(imarray1,sigma=0.5,k=100, gamma=0.98,epsilon=0.1,phi=10)
                    
         #Cross correlation
         corr = normxcorr2(roi_initial, imarray1, mode="same")
@@ -214,7 +212,7 @@ def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
         
         if SavePlot == True:
             fig, (ax_orig, ax_corr) = plt.subplots(1, 2)
-            ax_orig.imshow(image, cmap='gray')
+            ax_orig.imshow(imarray1, cmap='gray')
             ax_orig.set_title(f'{filename}(Image)')
             ax_orig.plot(x, y, 'ro',linewidth=2, markersize=12)
             ax_orig.set_axis_off()
@@ -227,7 +225,7 @@ def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
             plt.savefig(f"{OutFolder}/{OutName}/{filename}.png", bbox_inches='tight')
             plt.cla()
             plt.close(fig)         
-    print(f"image shape:{imarray1.shape}, ROI:{roi.shape}\n")
+    print(f"image shape:{imarray1.shape}, ROI:{roi_initial.shape}\n")
     return list_x, list_y
 
 def MSD(X ,Y,OutFolder,filename,length,ImgShow=False):
