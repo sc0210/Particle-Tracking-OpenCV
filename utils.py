@@ -67,7 +67,7 @@ def IMG2MP4(SrcFolder,OutFolder="./Export",OutName="test",FPS=5):
 def PNG2GIF(SrcFolder,OutFolder ,OutName,ImgFormat="png", duration=120):
     frames = [Image.open(image) for image in sorted(glob.glob(f"{SrcFolder}/*.{ImgFormat}"))]
     frame_one = frames[0]
-    frame_one.save(f"{OutFolder}/{OutName}.gif", format="GIF", append_images=frames,
+    frame_one.save(f"{OutFolder}/GIF/{OutName}.gif", format="GIF", append_images=frames,
         save_all=True, duration=duration, loop=0)
 
 def normxcorr2(template, image, mode="full"):
@@ -161,7 +161,7 @@ def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
     template = ReadGrayImg(f"{SrcFolder}/{sorted(os.listdir(SrcFolder))[ROI_INDEX]}", False)        
     output = cv2.cvtColor(template, cv2.COLOR_GRAY2BGR)
     blur = cv2.medianBlur(template,5)  
-    circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT,1,20,param1=50,param2=10,minRadius=3,maxRadius=20)
+    circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT,1,20,param1=50,param2=10,minRadius=5,maxRadius=23)
     print("////"*18)
     print(f"Currenet analysis image: {OutName}")
     if circles is not None:
@@ -170,7 +170,7 @@ def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
         #print(circles)
         # loop over the circles
         for i in circles[0,:]:
-            cv2.circle(output,(i[0],i[1]),i[2],(100, 103, 227),-1) # draw outer
+            cv2.circle(output,(i[0],i[1]),i[2],(255, 100, 227),1) # draw outer
             #cv2.circle(image, center_coordinates, radius, color, thickness)
             #Thickness of -1 px will fill the circle shape by the specified color.
             cv2.circle(output,(i[0],i[1]),1,(255,0,0),1) # draw center
@@ -184,40 +184,42 @@ def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
             Corr[5]=i[2] # circle radius
 
             print(f"CenterX,CenterY:({i[0]},{i[1]}); radius:{i[2]}; x1,y1:({x1},{y1}), (x2,y2):({x2},{y2})")
-
+    else:
+        print("There is no circles in the picture! Please check~")  
         
-    #cv2.imwrite(f"./Export/TrackFile/ROI/{OutName}_ROI.jpeg",output)
+    cv2.imwrite(f"./Export/TrackFile/ROI/{OutName}_ROI.png",output)
     roi = template.copy()
     cv2.circle(roi,(Corr[4],Corr[5]),Corr[6],(255, 0, 0),-1)
-    roi = np.asarray(roi)[Corr[1]:Corr[3], Corr[0]:Corr[2]] #26:44,18:34]# opposite input seleciton
-    roi = cv2.GaussianBlur(roi,(5,5),0)  
-    #roi = Toolkits.xdog_garygrossi(roi,sigma=0.5,k=200, gamma=0.98,epsilon=0.1,phi=10)
+    roi_initial = np.asarray(roi)[Corr[1]:Corr[3], Corr[0]:Corr[2]] #26:44,18:34]# opposite input seleciton
+    roi = cv2.GaussianBlur(roi_initial,(3,3),0)  
+    roi = xdog_garygrossi(roi,sigma=0.5,k=200, gamma=0.98,epsilon=0.1,phi=10)
+    #cv2.imwrite(f"./Export/TrackFile/ROI/ROI_{OutName}.png",roi)
 
     #---------NormalXCorr--------------------------------------------------------------------------------
     for filename in sorted(os.listdir(SrcFolder)):
         #num1, num2 = str(index).zfill(4), str(index+1).zfill(4)
         image = ReadGrayImg(f"{SrcFolder}/{filename}", False)
         imarray1 = np.asarray(image)
-        imarray1 = cv2.GaussianBlur(imarray1,(7,7),0)
+        imarray1 = cv2.GaussianBlur(imarray1,(3,3),0)
         #kernel = np.ones((3,3), np.uint8)
         #imarray1 = cv2.erode(imarray1, kernel, iterations = 1)
         #imarray1 = cv2.dilate(imarray1, kernel, iterations = 1)
-        #imarray1 = Toolkits.xdog_garygrossi(imarray1,sigma=0.5,k=200, gamma=0.98,epsilon=0.1,phi=10)
+        imarray1 = xdog_garygrossi(imarray1,sigma=0.5,k=200, gamma=0.98,epsilon=0.1,phi=10)
                    
         #Cross correlation
-        corr = normxcorr2(roi, imarray1, mode="same")
+        corr = normxcorr2(roi_initial, imarray1, mode="same")
         y, x = np.unravel_index(np.argmax(corr), corr.shape)  # find the match
         #print(f"x:{x},y:{y}")
         list_x.append(x),list_y.append(y)
         
         if SavePlot == True:
             fig, (ax_orig, ax_corr) = plt.subplots(1, 2)
-            ax_orig.imshow(imarray1, cmap='gray')
+            ax_orig.imshow(image, cmap='gray')
             ax_orig.set_title(f'{filename}(Image)')
             ax_orig.plot(x, y, 'ro',linewidth=2, markersize=12)
             ax_orig.set_axis_off()
 
-            ax_corr.imshow(roi, cmap='gray')
+            ax_corr.imshow(roi_initial, cmap='gray')
             ax_corr.set_title(f'No.{ROI_INDEX}(ROI/Template)')
             ax_corr.set_axis_off()
             fig.tight_layout()
@@ -227,3 +229,29 @@ def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
             plt.close(fig)         
     print(f"image shape:{imarray1.shape}, ROI:{roi.shape}\n")
     return list_x, list_y
+
+def MSD(X ,Y,OutFolder,filename,length,ImgShow=False):
+    sol=[];y=[]; length=len(X)
+    for interval in range(1,length): # Loop interval
+        dx1=[];dy1=[];avg_x=0;avg_y=0 
+        for i in range(0,length): # Loop in single string
+            if (i+interval) < length:
+                dx1.append(int(X[i+interval] - X[i]) **2)
+                dy1.append(int(Y[i+interval] - Y[i]) **2)
+        #print(dx1,dy1)
+        avg_x = round(sum(dx1)/len(dx1),4)
+        avg_y = round(sum(dy1)/len(dy1),4)
+        sol.append(avg_x + avg_y)
+        #print(avg_x,avg_y)
+    
+    y = sol
+    x = np.linspace(1,length-1,length-1)
+    fig = plt.figure(figsize=(10,5))
+    plt.plot(x,y) 
+    plt.title(f"{filename}")
+    plt.xlabel("Time interval"); plt.ylabel("MSD")
+    plt.axis([1,length,min(y)*0.8,max(y)*1.2])
+    fig.savefig(f"{OutFolder}/Plot/{filename}.png")       
+    if ImgShow ==True:
+        plt.show()
+    return sol
