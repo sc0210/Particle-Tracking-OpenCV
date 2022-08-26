@@ -1,6 +1,5 @@
 from utils import *
 import glob,os,os.path, numpy as np
-import matplotlib.pyplot as plt
 
 #----------------------ROOT folder setup---------------------#
 Root1 = "./Brownian_motion"
@@ -34,7 +33,7 @@ for index in groups[:]:
 #-Step3:Convert to animationn---------------------#
 # Convert sequenes of images(.jpg) into animantion(.mp4/.gif) -/TrackFile
 print(f"\nConverting into animation...")
-for index in groups:
+for index in groups[:]:
     SrcFolder=f"{Root2}/TrackFile/{index}"
     OutFolder=f"{Root2}/TrackFile"
     IMG2MP4(SrcFolder, OutFolder, OutName=f'Track_{index}', FPS=5)

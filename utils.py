@@ -34,7 +34,7 @@ def IMG2MP4(SrcFolder,OutFolder="./Export",OutName="test",FPS=5):
         OutName: (str) AVI clip name
         FPS: (int) frame per seonds
     """
-    print(f"Current:{OutName}")
+    print(f"Current process: {OutName}")
     FPS = int(FPS) # Frame per seconds
     SrcFolder = str(SrcFolder); OutFolder = str(OutFolder)
     video_name = f'{OutFolder}/{OutName}.mp4'
@@ -69,9 +69,10 @@ def PNG2GIF(SrcFolder,OutFolder ,OutName,ImgFormat="png", duration=120):
     frame_one = frames[0]
     frame_one.save(f"{OutFolder}/GIF/{OutName}.gif", format="GIF", append_images=frames,
         save_all=True, duration=duration, loop=0)
+    print(f"Current process: {OutName}")
+
 
 def normxcorr2(template, image, mode="full"):
-    from scipy.signal import fftconvolve
     ########################################################################################
     # Author: Ujash Joshi, University of Toronto, 2017                                     #
     # Based on Octave implementation by: Benjamin Eltzner, 2014 <b.eltzner@gmx.de>         #
@@ -182,50 +183,47 @@ def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
             Corr[4]=i[0] # center X
             Corr[5]=i[1] # center Y
             Corr[5]=i[2] # circle radius
-            cv2.imwrite(f"./Export/TrackFile/ROI/{OutName}_ROI.png",output)
+            output = output[Corr[1]:Corr[3], Corr[0]:Corr[2]]
+            cv2.imwrite(f"./Export/TrackFile/ROI/ROI_{OutName}.png",output)
 
             print(f"CenterX,CenterY:({i[0]},{i[1]}); radius:{i[2]}; x1,y1:({x1},{y1}), (x2,y2):({x2},{y2})")
     else:
         print("There is no circles in the picture! Please check~")  
         
     
-    roi = template.copy()
-    cv2.circle(roi,(Corr[4],Corr[5]),Corr[6],(255, 0, 0),-1)
-    roi_initial = np.asarray(roi[Corr[1]:Corr[3], Corr[0]:Corr[2]]) #26:44,18:34]# opposite input seleciton
-    #roi = cv2.GaussianBlur(roi_initial,(3,3),0)  
-    #roi = xdog_garygrossi(roi,sigma=0.5,k=200, gamma=0.98,epsilon=0.1,phi=10)
-    #cv2.imwrite(f"./Export/TrackFile/ROI/ROI_{OutName}.png",roi)
+    roi_initial = np.asarray(template.copy())
+    roi = cv2.medianBlur(roi_initial,5)
+    #roi = xdog_garygrossi(roi,sigma=0.5,k=100, gamma=0.98,epsilon=0.1,phi=10)
+    roi = roi[Corr[1]:Corr[3], Corr[0]:Corr[2]] #26:44,18:34]# opposite input seleciton
 
     #---------NormalXCorr--------------------------------------------------------------------------------
     for filename in sorted(os.listdir(SrcFolder)):
         #num1, num2 = str(index).zfill(4), str(index+1).zfill(4)
-        image = ReadGrayImg(f"{SrcFolder}/{filename}", False)
-        imarray1 = cv2.medianBlur(image,5)
-        imarray1 = np.asarray(imarray1)
-        #imarray1 = xdog_garygrossi(imarray1,sigma=0.5,k=100, gamma=0.98,epsilon=0.1,phi=10)
+        image_initial = np.asarray(ReadGrayImg(f"{SrcFolder}/{filename}", False))
+        image = cv2.medianBlur(image_initial,5)
+        image = xdog_garygrossi(image,sigma=0.5,k=100, gamma=0.98,epsilon=0.1,phi=10)
                    
-        #Cross correlation
-        corr = normxcorr2(roi_initial, imarray1, mode="same")
+        ## Cross correlation
+        corr = normxcorr2(roi, image, mode="same")
         y, x = np.unravel_index(np.argmax(corr), corr.shape)  # find the match
-        #print(f"x:{x},y:{y}")
         list_x.append(x),list_y.append(y)
         
         if SavePlot == True:
             fig, (ax_orig, ax_corr) = plt.subplots(1, 2)
-            ax_orig.imshow(imarray1, cmap='gray')
-            ax_orig.set_title(f'{filename}(Image)')
+            ax_orig.imshow(image_initial, cmap='gray')
+            ax_orig.set_title(f'{filename} (Image)')
             ax_orig.plot(x, y, 'ro',linewidth=2, markersize=12)
             ax_orig.set_axis_off()
 
-            ax_corr.imshow(roi_initial, cmap='gray')
-            ax_corr.set_title(f'No.{ROI_INDEX}(ROI/Template)')
+            ax_corr.imshow(output, cmap='gray')
+            ax_corr.set_title(f'No.{ROI_INDEX} (ROI/Template)')
             ax_corr.set_axis_off()
             fig.tight_layout()
             filename = filename.replace(".tif","")
             plt.savefig(f"{OutFolder}/{OutName}/{filename}.png", bbox_inches='tight')
             plt.cla()
             plt.close(fig)         
-    print(f"image shape:{imarray1.shape}, ROI:{roi_initial.shape}\n")
+    print(f"image shape:{image_initial.shape}, ROI:{roi.shape}\n")
     return list_x, list_y
 
 def MSD(X ,Y,OutFolder,filename,length,ImgShow=False):
@@ -237,8 +235,7 @@ def MSD(X ,Y,OutFolder,filename,length,ImgShow=False):
                 dx1.append(int(X[i+interval] - X[i]) **2)
                 dy1.append(int(Y[i+interval] - Y[i]) **2)
         #print(dx1,dy1)
-        avg_x = round(sum(dx1)/len(dx1),4)
-        avg_y = round(sum(dy1)/len(dy1),4)
+        avg_x,avg_y = round(sum(dx1)/len(dx1),4),round(sum(dy1)/len(dy1),4)
         sol.append(avg_x + avg_y)
         #print(avg_x,avg_y)
     

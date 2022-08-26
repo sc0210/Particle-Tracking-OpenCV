@@ -38,7 +38,8 @@
   - [ ] TA (teaching material, demo code, ppt)
 
 ## References 
-1. HoughCircles() OpenCV document [https://reurl.cc/0XZbxb]
-2. Python OpenCV 影像二值化 Image Thresholding [https://reurl.cc/D3Ax9e]
-3. cv2霍夫圓環檢測（HoughCircle）[https://reurl.cc/KQ02k9]
-4. Git remote connection [https://reurl.cc/rR50xZ]
+1. HoughCircles() (OpenCV document) [https://reurl.cc/0XZbxb]
+2. Canny edge detection (OpenCV document) [https://reurl.cc/GEK9xy]
+3. Python OpenCV 影像二值化 Image Thresholding [https://reurl.cc/D3Ax9e]
+4. cv2霍夫圓環檢測（HoughCircle）[https://reurl.cc/KQ02k9]
+5. Git remote connection [https://reurl.cc/rR50xZ]
