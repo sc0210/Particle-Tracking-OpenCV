@@ -23,12 +23,11 @@ for index in groups:
     #IMG2MP4(SrcFolder, OutFolder, OutName=f'{index}', FPS=5)
 
 #-Step2:Track through ROI------------------------# 
-for index in groups[5:6]:
+for index in groups[:]:
     SrcFolder=f"./Brownian_motion/{index}"
     OutFolder=f"{Root2}/TrackFile"
     X,Y = Track(SrcFolder, OutFolder, OutName=f"{index}", SavePlot=True)
-    length =len(X)
-    MSD(X ,Y, OutFolder, index,length,ImgShow=False)
+    MSD(X ,Y, OutFolder, index,ImgShow=False)
     #MDD(X,Y)
 
 #-Step3:Convert to animationn---------------------#
