@@ -179,7 +179,7 @@ def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
         #print(circles)
         # loop over the circles
         for i in circles[0,:]:
-            cv2.circle(output,(i[0],i[1]),i[2],(255, 100, 227),1) # draw outer
+            cv2.circle(output,(i[0],i[1]),i[2],(255, 0, 0),1) # draw outer
             #cv2.circle(image, center_coordinates, radius, color, thickness)
             #Thickness of -1 px will fill the circle shape by the specified color.
             cv2.circle(output,(i[0],i[1]),1,(255,0,0),1) # draw center
