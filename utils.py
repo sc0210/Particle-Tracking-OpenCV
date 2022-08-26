@@ -1,15 +1,20 @@
 import cv2, os, glob
 from PIL import Image
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import signal
 from scipy.signal import fftconvolve
 from functools import partial
 import seaborn as sns
-import pandas as pd
 
+def EnvSetup(path):
+    if os.path.exists(path) == False:
+        os.mkdir(path)
 
-def makefolders(root_dir, subfolders):
+def MakeSubFolders(root_dir, subfolders):
+    for index in ['ROI','GIF','Plot']:
+        subfolders.append(index)
     concat_path = partial(os.path.join, root_dir)
     for subfolder in map(concat_path, subfolders):
         os.makedirs(subfolder, exist_ok=True)  # Python 3.2+
@@ -37,7 +42,7 @@ def IMG2MP4(SrcFolder,OutFolder="./Export",OutName="test",FPS=5):
         OutName: (str) AVI clip name
         FPS: (int) frame per seonds
     """
-    print(f"Current process: {OutName}")
+    print(f"Converting to MP4...{OutName}")
     FPS = int(FPS) # Frame per seconds
     SrcFolder = str(SrcFolder); OutFolder = str(OutFolder)
     video_name = f'{OutFolder}/{OutName}.mp4'
@@ -68,12 +73,12 @@ def IMG2MP4(SrcFolder,OutFolder="./Export",OutName="test",FPS=5):
     video.release()
 
 def PNG2GIF(SrcFolder,OutFolder ,OutName,ImgFormat="png", duration=120):
+    frames = []
     frames = [Image.open(image) for image in sorted(glob.glob(f"{SrcFolder}/*.{ImgFormat}"))]
     frame_one = frames[0]
     frame_one.save(f"{OutFolder}/GIF/{OutName}.gif", format="GIF", append_images=frames,
         save_all=True, duration=duration, loop=0)
-    print(f"Current process: {OutName}")
-
+    print(f"Converting to GIF...{OutName}")
 
 def normxcorr2(template, image, mode="full"):
     ########################################################################################
@@ -155,7 +160,7 @@ def xdog_garygrossi(img,sigma=0.5,k=200, gamma=0.98,epsilon=0.1,phi=10):
     return aux*255
 
 def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
-    Corr =[0,0,0,0,0,0,0]
+    Corr =[0,0,0,0,0,0,0] #x1, x2, y1, y2, centerx, centery, radius
     list_x ,list_y = [],[]
 
     #---------ROI section--------------------------------------------------------------------------------
@@ -191,7 +196,7 @@ def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
 
             print(f"CenterX,CenterY:({i[0]},{i[1]}); radius:{i[2]}; x1,y1:({x1},{y1}), (x2,y2):({x2},{y2})")
     else:
-        print("There is no circles in the picture! Please check~")  
+        print("There is no circles in the picture! Please check~\n")  
         
     
     roi_initial = np.asarray(template.copy())
@@ -255,7 +260,7 @@ def MSD(X ,Y,OutFolder,filename,ImgShow=False):
         plt.show()
     return sol
 
-def MDD(X, Y):
+def MDD(X, Y,OutFolder,filename,ImgShow=False):
     sol=[];y=[]; length=len(X)
     for interval in range(1,length): # Loop interval
         dx1=[];dy1=[];avg_x=0;avg_y=0 
@@ -267,11 +272,19 @@ def MDD(X, Y):
         avg_x,avg_y = round(sum(dx1)/len(dx1),4),round(sum(dy1)/len(dy1),4)
         sol.append(avg_x + avg_y)
         #print(avg_x,avg_y)
-    
-    y = sol
-    x = np.linspace(1,length-1,length-1)
-    df = pd.DataFrame(x,y)
-    print(df)
-    g=sns.regplot(x="Time Interval",y="MSD",data=df)
+   
+    sns.set_theme(color_codes=True)
+    g = plt.figure(figsize=(10,5))
+    g =sns.regplot(x=np.linspace(1,length-1,length-1),
+                y=sol, marker='o', label="example",
+                robust=False, ci=95,
+                scatter_kws={'s': 10, 'color':'#46b4b4'},
+                line_kws={'lw': 2, 'color': '#b4466e'}) 
     g.figure.autofmt_xdate()
+    plt.title(f'Linear Regression of {filename}')
+    plt.xlabel("Time interval"); plt.ylabel("MSD")
+    if ImgShow ==True:
+        plt.show()
+    plt.savefig(f"{OutFolder}/Plot/{filename}.png")  
+
     return sol

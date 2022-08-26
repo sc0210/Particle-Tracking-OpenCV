@@ -1,44 +1,44 @@
+import argparse
+parser = argparse.ArgumentParser(description='test')
+parser.add_argument('--ani', type=bool, default=True, help='Convert sequence of images into .mp4')
+parser.add_argument('--mp4', type=bool, default=False, help='Export .mp4')
+parser.add_argument('--gif', type=bool, default=False, help='Export .gif')
+args = parser.parse_args()
+_ANI,_MP4,_GIF = args.ani, args.mp4, args.gif
+
 from utils import *
-import glob,os,os.path, numpy as np
-
-#----------------------ROOT folder setup---------------------#
+#----Step1:ROOT folder/Envs setup---------------------#
 Root1 = "./Brownian_motion"
-Root2 = "./Export"
-    
-#----------------------Envs folder setup---------------------#
-# Create folder "TrackFile"
-root_dir = './Export/TrackFile'
-subfolders =  ['1', '2', '3', '4', '5','Free','Laser','ROI','GIF','Plot']
-groups = ['1', '2', '3', '4', '5','Free','Laser'] # Named after group
-makefolders(root_dir,subfolders)
-# Create folder "RawData"
-if os.path.exists("./Export/RawData") == False:
-    os.mkdir("./Export/RawData")
+Root2 = "./Export";  Root3 = f'{Root2}/TrackFile'
+groups = ['1', '2', '3', '4', '5','Free','Laser'] # Named after exp. group
+NUM = len(groups) # 7 experiments in total
 
-#-Step1:Convert to animation---------------------#
-# Convert sequenes of images(.tif) into animantion(.mp4) -/RawData
-for index in groups:
+MakeSubFolders(Root3, groups) # Create subfolders "ROI", "GIF", "Plot"
+EnvSetup(f'{Root2}/RawData') # Create folder "RawData"
+
+#----Step2:Convert to animation----------------------#
+for index in groups[:NUM]:
     SrcFolder=f"{Root1}/{index}"
     OutFolder=f"{Root2}/RawData"
-    #IMG2MP4(SrcFolder, OutFolder, OutName=f'{index}', FPS=5)
+    if _ANI == True:
+        IMG2MP4(SrcFolder, OutFolder, OutName=f'{index}', FPS=5)
 
-#-Step2:Track through ROI------------------------# 
-for index in groups[:]:
-    SrcFolder=f"./Brownian_motion/{index}"
-    OutFolder=f"{Root2}/TrackFile"
-    X,Y = Track(SrcFolder, OutFolder, OutName=f"{index}", SavePlot=True)
-    MSD(X ,Y, OutFolder, index,ImgShow=False)
-    #MDD(X,Y)
-
-#-Step3:Convert to animationn---------------------#
-# Convert sequenes of images(.jpg) into animantion(.mp4/.gif) -/TrackFile
-print(f"\nConverting into animation...")
-for index in groups[:]:
-    SrcFolder=f"{Root2}/TrackFile/{index}"
-    OutFolder=f"{Root2}/TrackFile"
-    #IMG2MP4(SrcFolder, OutFolder, OutName=f'Track_{index}', FPS=5)
-    #PNG2GIF(SrcFolder, OutFolder, OutName=f"Track_{index}",ImgFormat="png", duration=120)
+#----Step3:Track through ROI-------------------------# 
+for index in groups[:NUM]:
+    SrcFolder1=f"{Root1}/{index}"
+    SrcFolder2=f"{Root3}/{index}"
+    OutFolder=f"{Root3}"
     
+    X,Y = Track(SrcFolder1, OutFolder, OutName=f"{index}", SavePlot=True)
+    # MSD(X ,Y, OutFolder, index, ImgShow=False)
+    MDD(X ,Y, OutFolder, index, ImgShow=False)
+    
+    if _MP4 | _GIF == True:
+        print(f"*Converting into animation...")
+    if _MP4 == True:
+        IMG2MP4(SrcFolder2,OutFolder,OutName=f'Track_{index}', FPS=5)
+    if _GIF ==True:    
+        PNG2GIF(SrcFolder2,OutFolder,OutName=f"Track_{index}",ImgFormat="png", duration=120)        
 
 print("////"*18)
 print(f"\nThis is the end of analysis! Check results in './Export'")
