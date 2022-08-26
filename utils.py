@@ -172,14 +172,14 @@ def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
     #blur = cv2.GaussianBlur(template,(7,7),0)
     circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT,1,20,param1=50,param2=20,minRadius=5,maxRadius=25)
     print("////"*18)
-    print(f"Currenet analysis image: {OutName}")
+    print(f"=> Currenet analysis image: {OutName}")
     if circles is not None:
         # Get the (x, y, r) as integers
         circles = np.uint16(np.around(circles))
         #print(circles)
         # loop over the circles
         for i in circles[0,:]:
-            cv2.circle(output,(i[0],i[1]),i[2],(255, 0, 0),1) # draw outer
+            cv2.circle(output,(i[0],i[1]),i[2],(73, 235, 52),1) # draw outer
             #cv2.circle(image, center_coordinates, radius, color, thickness)
             #Thickness of -1 px will fill the circle shape by the specified color.
             cv2.circle(output,(i[0],i[1]),1,(255,0,0),1) # draw center
@@ -218,16 +218,16 @@ def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
         
         if SavePlot == True:
             fig, (ax_orig, ax_corr) = plt.subplots(1, 2)
-            ax_orig.imshow(image_initial, cmap='gray')
+            ax_orig.imshow(image_initial, cmap="gray")
             ax_orig.set_title(f'{filename} (Image)')
-            ax_orig.plot(x, y, 'ro',linewidth=2, markersize=12)
+            ax_orig.plot(x, y, 'ro',linewidth=2, markersize=10)
             ax_orig.set_axis_off()
 
             ax_corr.imshow(output, cmap='gray')
             ax_corr.set_title(f'No.{ROI_INDEX} (ROI/Template)')
             ax_corr.set_axis_off()
-            fig.tight_layout()
             filename = filename.replace(".tif","")
+            plt.rcParams.update({'font.size': 14})
             plt.savefig(f"{OutFolder}/{OutName}/{filename}.png", bbox_inches='tight')
             plt.cla()
             plt.close(fig)         
@@ -250,11 +250,13 @@ def MSD(X ,Y,OutFolder,filename,ImgShow=False):
     y = sol
     x = np.linspace(1,length-1,length-1)
     
-    fig = plt.figure(figsize=(10,5))
-    plt.plot(x,y) 
+    fig = plt.subplots(figsize=(8,5))
+    plt.plt(x,y)
     plt.title(f"{filename}")
     plt.xlabel("Time interval"); plt.ylabel("MSD")
     plt.axis([1,length,min(y)*0.8,max(y)*1.2])
+    plt.tight_layout()
+    plt.rcParams.update({'font.size': 16})
     fig.savefig(f"{OutFolder}/Plot/{filename}.png")       
     if ImgShow ==True:
         plt.show()
@@ -274,15 +276,18 @@ def MDD(X, Y,OutFolder,filename,ImgShow=False):
         #print(avg_x,avg_y)
    
     sns.set_theme(color_codes=True)
-    g = plt.figure(figsize=(10,5))
-    g =sns.regplot(x=np.linspace(1,length-1,length-1),
+    fig = plt.figure(figsize=(8,5))
+    fig =sns.regplot(x=np.linspace(1,length-1,length-1),
                 y=sol, marker='o', label="example",
                 robust=False, ci=95,
                 scatter_kws={'s': 10, 'color':'#46b4b4'},
                 line_kws={'lw': 2, 'color': '#b4466e'}) 
-    g.figure.autofmt_xdate()
+    fig.figure.autofmt_xdate()
     plt.title(f'Linear Regression of {filename}')
     plt.xlabel("Time interval"); plt.ylabel("MSD")
+    plt.rcParams.update({'font.size': 24})
+
+    plt.tight_layout()
     if ImgShow ==True:
         plt.show()
     plt.savefig(f"{OutFolder}/Plot/{filename}.png")  

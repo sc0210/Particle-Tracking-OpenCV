@@ -1,10 +1,10 @@
 import argparse
 parser = argparse.ArgumentParser(description='test')
 parser.add_argument('-a','--Animation', type=bool, default=True, help='Convert sequence of images into .mp4')
-parser.add_argument('-m','--ExportMP4', type=bool, default=False, help='Export .mp4')
-parser.add_argument('-g','--ExportGIF', type=bool, default=False, help='Export .gif')
+parser.add_argument('-m','--ExportMP4', type=bool, default=True, help='Export .mp4')
+parser.add_argument('-g','--ExportGIF', type=bool, default=True, help='Export .gif')
 args = parser.parse_args()
-_ANI,_MP4,_GIF = args.ani, args.mp4, args.gif
+_ANI,_MP4,_GIF = args.Animation, args.ExportMP4, args.ExportGIF
 
 from utils import *
 #----Step1:ROOT folder/Envs setup---------------------#
@@ -20,8 +20,8 @@ EnvSetup(f'{Root2}/RawData') # Create folder "RawData"
 for index in groups[:NUM]:
     SrcFolder=f"{Root1}/{index}"
     OutFolder=f"{Root2}/RawData"
-    if _ANI == True:
-        IMG2MP4(SrcFolder, OutFolder, OutName=f'{index}', FPS=5)
+    #if _ANI == True:
+        #IMG2MP4(SrcFolder, OutFolder, OutName=f'{index}', FPS=5)
 
 #----Step3:Track through ROI-------------------------# 
 for index in groups[:NUM]:
@@ -34,7 +34,7 @@ for index in groups[:NUM]:
     MDD(X ,Y, OutFolder, index, ImgShow=False)
     
     if _MP4 | _GIF == True:
-        print(f"*Converting into animation...")
+        print(f"=> Converting into animation...")
     if _MP4 == True:
         IMG2MP4(SrcFolder2,OutFolder,OutName=f'Track_{index}', FPS=5)
     if _GIF ==True:    

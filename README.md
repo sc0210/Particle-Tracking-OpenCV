@@ -3,7 +3,11 @@
 
 ## Sample result
 ![free1_0100.png](./Export/TrackFile/GIF/Track_Free.gif)
+![free1_0100.png](./Export/TrackFile/GIF/Track_Laser.gif)
+
 ![free1_0100.png](./Export/TrackFile/Plot/Free.png)
+![free1_0100.png](./Export/TrackFile/Plot/Laser.png)
+
 
 
 ## Steps to follow
