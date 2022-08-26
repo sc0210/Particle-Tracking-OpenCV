@@ -1,8 +1,8 @@
 import argparse
 parser = argparse.ArgumentParser(description='test')
-parser.add_argument('--ani', type=bool, default=True, help='Convert sequence of images into .mp4')
-parser.add_argument('--mp4', type=bool, default=False, help='Export .mp4')
-parser.add_argument('--gif', type=bool, default=False, help='Export .gif')
+parser.add_argument('-a','--Animation', type=bool, default=True, help='Convert sequence of images into .mp4')
+parser.add_argument('-m','--ExportMP4', type=bool, default=False, help='Export .mp4')
+parser.add_argument('-g','--ExportGIF', type=bool, default=False, help='Export .gif')
 args = parser.parse_args()
 _ANI,_MP4,_GIF = args.ani, args.mp4, args.gif
 
