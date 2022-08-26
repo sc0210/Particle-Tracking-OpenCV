@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 from scipy import signal
 from scipy.signal import fftconvolve
 from functools import partial
+import seaborn as sns
+import pandas as pd
+
 
 def makefolders(root_dir, subfolders):
     concat_path = partial(os.path.join, root_dir)
@@ -226,7 +229,7 @@ def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
     print(f"image shape:{image_initial.shape}, ROI:{roi.shape}\n")
     return list_x, list_y
 
-def MSD(X ,Y,OutFolder,filename,length,ImgShow=False):
+def MSD(X ,Y,OutFolder,filename,ImgShow=False):
     sol=[];y=[]; length=len(X)
     for interval in range(1,length): # Loop interval
         dx1=[];dy1=[];avg_x=0;avg_y=0 
@@ -241,6 +244,7 @@ def MSD(X ,Y,OutFolder,filename,length,ImgShow=False):
     
     y = sol
     x = np.linspace(1,length-1,length-1)
+    
     fig = plt.figure(figsize=(10,5))
     plt.plot(x,y) 
     plt.title(f"{filename}")
@@ -249,4 +253,25 @@ def MSD(X ,Y,OutFolder,filename,length,ImgShow=False):
     fig.savefig(f"{OutFolder}/Plot/{filename}.png")       
     if ImgShow ==True:
         plt.show()
+    return sol
+
+def MDD(X, Y):
+    sol=[];y=[]; length=len(X)
+    for interval in range(1,length): # Loop interval
+        dx1=[];dy1=[];avg_x=0;avg_y=0 
+        for i in range(0,length): # Loop in single string
+            if (i+interval) < length:
+                dx1.append(int(X[i+interval] - X[i]) **2)
+                dy1.append(int(Y[i+interval] - Y[i]) **2)
+        #print(dx1,dy1)
+        avg_x,avg_y = round(sum(dx1)/len(dx1),4),round(sum(dy1)/len(dy1),4)
+        sol.append(avg_x + avg_y)
+        #print(avg_x,avg_y)
+    
+    y = sol
+    x = np.linspace(1,length-1,length-1)
+    df = pd.DataFrame(x,y)
+    print(df)
+    g=sns.regplot(x="Time Interval",y="MSD",data=df)
+    g.figure.autofmt_xdate()
     return sol

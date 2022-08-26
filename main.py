@@ -23,12 +23,13 @@ for index in groups:
     #IMG2MP4(SrcFolder, OutFolder, OutName=f'{index}', FPS=5)
 
 #-Step2:Track through ROI------------------------# 
-for index in groups[:]:
+for index in groups[5:6]:
     SrcFolder=f"./Brownian_motion/{index}"
     OutFolder=f"{Root2}/TrackFile"
     X,Y = Track(SrcFolder, OutFolder, OutName=f"{index}", SavePlot=True)
     length =len(X)
     MSD(X ,Y, OutFolder, index,length,ImgShow=False)
+    #MDD(X,Y)
 
 #-Step3:Convert to animationn---------------------#
 # Convert sequenes of images(.jpg) into animantion(.mp4/.gif) -/TrackFile
@@ -36,8 +37,8 @@ print(f"\nConverting into animation...")
 for index in groups[:]:
     SrcFolder=f"{Root2}/TrackFile/{index}"
     OutFolder=f"{Root2}/TrackFile"
-    IMG2MP4(SrcFolder, OutFolder, OutName=f'Track_{index}', FPS=5)
-    PNG2GIF(SrcFolder, OutFolder, OutName=f"Track_{index}",ImgFormat="png", duration=120)
+    #IMG2MP4(SrcFolder, OutFolder, OutName=f'Track_{index}', FPS=5)
+    #PNG2GIF(SrcFolder, OutFolder, OutName=f"Track_{index}",ImgFormat="png", duration=120)
     
 
 print("////"*18)
