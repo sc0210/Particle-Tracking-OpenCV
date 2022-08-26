@@ -1,5 +1,5 @@
 # Particle-Tracking-python-OpenCV
-> This project is inspired by a hands-on lecture (Brownian motion exp.) in school. The main goal of this project is to extend self-learning programing skill and provide more convenient tools to optimized the postprocessing. Looking forward to share with junior students! 
+> This project is inspired by a hands-on lecture (Brownian motion exp.) in school. The main goal of this project is to extend self-learning programing skill and provide tools to optimize the workflow. Currently, looking forward to share with junior students! 
 
 ## Sample result
 ![free1_0100.png](./Export/TrackFile/GIF/Track_Free.gif)
@@ -32,7 +32,8 @@
   - [ ] Coefficient of viscosity
   - [x] Graph the in XY cororidnated system
   - `MSD(X,Y,OutFolder,filename,length,ImgShow=False)`
-  
+  - `MDD(X,Y,OutFolder,filename,length,ImgShow=False)`
+ 
 - [ ] Part 2 Organized and record the process
   - [ ] Github -> *Create this repository!* 
   - [ ] TA (teaching material, demo code, ppt)
