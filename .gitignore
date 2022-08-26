@@ -1,5 +1,3 @@
 Secert/
-
-plan.md
-
-Export/TrackFile/*.png
+__pycache__
+.ipynb_checkpoints
