@@ -253,10 +253,11 @@ def MSD(X ,Y,OutFolder,filename,ImgShow=False):
     fig = plt.subplots(figsize=(8,5))
     plt.plt(x,y)
     plt.title(f"{filename}")
-    plt.xlabel("Time interval"); plt.ylabel("MSD")
+    plt.xlabel("Time interval",fontsize=18) 
+    plt.ylabel("MSD","fontsize=18")
     plt.axis([1,length,min(y)*0.8,max(y)*1.2])
     plt.tight_layout()
-    plt.rcParams.update({'font.size': 16})
+    
     fig.savefig(f"{OutFolder}/Plot/{filename}.png")       
     if ImgShow ==True:
         plt.show()
@@ -284,9 +285,8 @@ def MDD(X, Y,OutFolder,filename,ImgShow=False):
                 line_kws={'lw': 2, 'color': '#b4466e'}) 
     fig.figure.autofmt_xdate()
     plt.title(f'Linear Regression of {filename}')
-    plt.xlabel("Time interval"); plt.ylabel("MSD")
-    plt.rcParams.update({'font.size': 24})
-
+    plt.xlabel("Time interval",fontsize=18) 
+    plt.ylabel("MSD",fontsize=18)
     plt.tight_layout()
     if ImgShow ==True:
         plt.show()
