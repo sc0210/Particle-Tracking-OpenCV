@@ -1,4 +1,4 @@
-# Particle-Tracking-python-OpenCV
+# Particle-Tracking-OpenCV
 > This project is inspired by a hands-on lecture (Brownian motion exp.) in school. The main goal of this project is to extend self-learning programing skill and provide tools to optimize the workflow. Currently, looking forward to share with junior students! 
 
 ## Sample result
