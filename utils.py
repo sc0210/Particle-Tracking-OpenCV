@@ -54,11 +54,13 @@ def IMG2MP4(SrcFolder,OutFolder="./Export",OutName="test",FPS=5):
         images = [img for img in os.listdir(SrcFolder) if img.endswith(".tif")]
     elif ImgType == ".png":
         images = [img for img in sorted(os.listdir(SrcFolder)) if img.endswith(".png")]
+    elif ImgType == ".jpg":
+        images = [img for img in sorted(os.listdir(SrcFolder)) if img.endswith(".jpg")]
     else:
         print("Not recongized image type")
        
     # Fetch the frame shape(e.g height, width, layer) 
-    frame = cv2.imread(os.path.join(SrcFolder, images[0]))
+    frame = cv2.imread(os.path.join(SrcFolder, images[0])) 
     height, width, layers = frame.shape
             
     # Adjust output location
