@@ -61,7 +61,7 @@ def IMG2MP4(SrcFolder,OutFolder="./Export",OutName="test",FPS=5):
        
     # Fetch the frame shape(e.g height, width, layer) 
     frame = cv2.imread(os.path.join(SrcFolder, images[0])) 
-    height, width, layers = frame.shape
+    height, width,layers = frame.shape
             
     # Adjust output location
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
@@ -75,7 +75,6 @@ def IMG2MP4(SrcFolder,OutFolder="./Export",OutName="test",FPS=5):
     video.release()
 
 def PNG2GIF(SrcFolder,OutFolder ,OutName,ImgFormat="png", duration=120):
-    frames = []
     frames = [Image.open(image) for image in sorted(glob.glob(f"{SrcFolder}/*.{ImgFormat}"))]
     frame_one = frames[0]
     frame_one.save(f"{OutFolder}/GIF/{OutName}.gif", format="GIF", append_images=frames,
@@ -161,7 +160,7 @@ def xdog_garygrossi(img,sigma=0.5,k=200, gamma=0.98,epsilon=0.1,phi=10):
                 aux[i][j] = 1 + ht
     return aux*255
 
-def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
+def Track(SrcFolder, OutFolder,OutName="test",SavePlot=True):
     Corr =[0,0,0,0,0,0,0] #x1, x2, y1, y2, centerx, centery, radius
     list_x ,list_y = [],[]
 
@@ -217,27 +216,39 @@ def Track(SrcFolder, OutFolder,OutName="test" ,SavePlot=True):
         corr = normxcorr2(roi, image, mode="same")
         y, x = np.unravel_index(np.argmax(corr), corr.shape)  # find the match
         list_x.append(x),list_y.append(y)
-        
-        if SavePlot == True:
+    
+    #---------Plot Figure--------------------------------------------------------------------------------    
+    if SavePlot == True | 1:
+
+        for filename in sorted(os.listdir(SrcFolder)):
+            image_initial = np.asarray(ReadGrayImg(f"{SrcFolder}/{filename}", False))            
             fig, (ax_orig, ax_corr) = plt.subplots(1, 2)
             ax_orig.imshow(image_initial, cmap="gray")
             ax_orig.set_title(f'{filename} (Image)')
-            ax_orig.plot(x, y, 'ro',linewidth=2, markersize=10)
             ax_orig.set_axis_off()
 
-            ax_corr.imshow(output, cmap='gray')
+            index = sorted(os.listdir(SrcFolder)).index(filename)
+            # Plot xy-center
+            ax_orig.plot(list_x[index], list_y[index],'ro', markersize=10)
+            # Plot whole track
+            ax_orig.plot(list_x[index-5:index+2], list_y[index-5:index+2],'g',marker='.',linewidth="1",markersize=5,alpha=0.8)
+
+            # Plot ROI reference
+            ax_corr.imshow(output, cmap="gray")
             ax_corr.set_title(f'No.{ROI_INDEX} (ROI/Template)')
             ax_corr.set_axis_off()
+
             filename = filename.replace(".tif","")
-            plt.rcParams.update({'font.size': 14})
-            plt.savefig(f"{OutFolder}/{OutName}/{filename}.png", bbox_inches='tight')
+            plt.savefig(f"{OutFolder}/{OutName}/{filename}.png", bbox_inches='tight',fontsize=16)
             plt.cla()
             plt.close(fig)         
+    
     print(f"image shape:{image_initial.shape}, ROI:{roi.shape}\n")
     return list_x, list_y
 
 def MSD(X ,Y,OutFolder,filename,ImgShow=False):
     sol=[];y=[]; length=len(X)
+
     for interval in range(1,length): # Loop interval
         dx1=[];dy1=[];avg_x=0;avg_y=0 
         for i in range(0,length): # Loop in single string
@@ -254,9 +265,9 @@ def MSD(X ,Y,OutFolder,filename,ImgShow=False):
     
     fig = plt.subplots(figsize=(8,5))
     plt.plt(x,y)
-    plt.title(f"{filename}")
+    plt.title(f"{filename}",fontsize=18)
     plt.xlabel("Time interval",fontsize=18) 
-    plt.ylabel("MSD","fontsize=18")
+    plt.ylabel("MSD",fontsize=18)
     plt.axis([1,length,min(y)*0.8,max(y)*1.2])
     plt.tight_layout()
     

@@ -1,10 +1,10 @@
 import argparse
 parser = argparse.ArgumentParser(description='test')
-parser.add_argument('-a','--Animation', type=bool, default=True, help='Convert sequence of images into .mp4')
-parser.add_argument('-m','--ExportMP4', type=bool, default=True, help='Export .mp4')
-parser.add_argument('-g','--ExportGIF', type=bool, default=True, help='Export .gif')
+parser.add_argument('-a','--Animation',type=int,default=True, help='Convert sequence of images into .mp4')
+parser.add_argument('-s','--SaveFig',type=int,default=True, help='Save plot results')
+parser.add_argument('-v','--ExportVid',type=int,default=True, help='Export .mp4 & .gif')
 args = parser.parse_args()
-_ANI,_MP4,_GIF = args.Animation, args.ExportMP4, args.ExportGIF
+_ANI,_Plot,_Export = args.Animation, args.SaveFig, args.ExportVid
 
 from utils import *
 #----Step1:ROOT folder/Envs setup---------------------#
@@ -20,24 +20,22 @@ EnvSetup(f'{Root2}/RawData') # Create folder "RawData"
 for index in groups[:NUM]:
     SrcFolder=f"{Root1}/{index}"
     OutFolder=f"{Root2}/RawData"
-    #if _ANI == True:
-        #IMG2MP4(SrcFolder, OutFolder, OutName=f'{index}', FPS=5)
+    if _ANI == True|1:
+        IMG2MP4(SrcFolder, OutFolder, OutName=f'{index}', FPS=5)
 
 #----Step3:Track through ROI-------------------------# 
 for index in groups[:NUM]:
     SrcFolder1=f"{Root1}/{index}"
     SrcFolder2=f"{Root3}/{index}"
     OutFolder=f"{Root3}"
-    
-    X,Y = Track(SrcFolder1, OutFolder, OutName=f"{index}", SavePlot=True)
+        
+    X,Y = Track(SrcFolder1, OutFolder, OutName=f"{index}", SavePlot=_Plot)
     # MSD(X ,Y, OutFolder, index, ImgShow=False)
     MDD(X ,Y, OutFolder, index, ImgShow=False)
     
-    if _MP4 | _GIF == True:
+    if _Export  == True|1:
         print(f"=> Converting into animation...")
-    if _MP4 == True:
         IMG2MP4(SrcFolder2,OutFolder,OutName=f'Track_{index}', FPS=5)
-    if _GIF ==True:    
         PNG2GIF(SrcFolder2,OutFolder,OutName=f"Track_{index}",ImgFormat="png", duration=120)        
 
 print("////"*18)

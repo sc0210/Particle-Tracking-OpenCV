@@ -4,6 +4,7 @@ matplotlib
 numpy
 #pandas
 scipy
+seaborn
 
 ##### Image manipulation
 Pillow
