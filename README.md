@@ -27,7 +27,7 @@ $ pip install -r requirements
 # Step4 Execute main program (data must invovle in the same folder path)
 $ python main.py
 ```
-3. Analyze dine! Check up the result in `./Export`
+3. Analyze done! Check up the result in `./Export`
 
 ## Check list  
 ***(last updated 8/24***)
