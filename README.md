@@ -10,7 +10,7 @@
 ## Steps to follow
 1. Organize input data (tif images) by group and store in respective folder 
 ```
-Folder_Name_List = ['1', '2', '3', '4', '5','Free','Laser','Control]
+Folder_Name_List = ['1', '2', '3', '4', '5','Free','Laser']
 ```
 
 2. Program Setup
