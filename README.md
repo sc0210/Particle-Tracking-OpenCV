@@ -16,7 +16,7 @@ Folder_Name_List = ['1', '2', '3', '4', '5','Free','Laser']
 2. Program Setup
 ```
 # Step1 Clone this repository to your folder 
-$ git clone https://github.com/samchen0210/Particle-Tracking-OpenCV.git
+$ git clone https://github.com/sc0210/Particle-Tracking-OpenCV.git
 
 # Step2 Move current working directory into the folder.
 $ cd Particle-Tracking-OpenCV
