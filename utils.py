@@ -286,7 +286,7 @@ def MDD(X, Y,OutFolder,filename,ImgShow=False):
                 scatter_kws={'s': 10, 'color':'#46b4b4'},
                 line_kws={'lw': 2, 'color': '#b4466e'}) 
     fig.figure.autofmt_xdate()
-    plt.title(f'Linear Regression of {filename}')
+    plt.title(f'Linear Regression of {filename}',fontsize=18)
     plt.xlabel("Time interval",fontsize=18) 
     plt.ylabel("MSD",fontsize=18)
     plt.tight_layout()
