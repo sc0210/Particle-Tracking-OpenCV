@@ -2,12 +2,11 @@
 > This project is inspired by a hands-on lecture (Brownian motion exp.) in school. The main goal of this project is to extend self-learning programing skill and provide tools to optimize the workflow. Currently, looking forward to share with junior students! 
 
 ## Sample result
-![free1_0100.png](./Export/TrackFile/GIF/Track_Free.gif)
-![free1_0100.png](./Export/TrackFile/GIF/Track_Laser.gif)
+<img src ="./Export/TrackFile/GIF/Track_Free.gif" width="800">
+<img src="./Export/TrackFile/GIF/Track_Laser.gif" width="800">
 
-![free1_0100.png](./Export/TrackFile/Plot/Free.png)
-![free1_0100.png](./Export/TrackFile/Plot/Laser.png)
-
+<img src="./Export/TrackFile/Plot/Free.png" width="800">
+<img src="./Export/TrackFile/Plot/Laser.png" width="800">
 
 
 ## Steps to follow
