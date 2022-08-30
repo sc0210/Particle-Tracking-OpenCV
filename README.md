@@ -2,27 +2,29 @@
 > This project is inspired by a hands-on lecture (Brownian motion exp.) in school. The main goal of this project is to extend self-learning programing skill and provide tools to optimize the workflow. Currently, looking forward to share with junior students! 
 
 ## Sample result
-<img src ="./Export/TrackFile/GIF/Track_Free.gif" width="430">
-<img src="./Export/TrackFile/GIF/Track_Laser.gif" width="430">
+<img src ="./Export/TrackFile/GIF/Track_Free.gif" width="500"> <img src="./Export/TrackFile/GIF/Track_Laser.gif" width="500">
 
-<img src="./Export/TrackFile/Plot/Free.png" width="430">
-<img src="./Export/TrackFile/Plot/Laser.png" width="430">
+<img src="./Export/TrackFile/Plot/Free.png" width="500"> <img src="./Export/TrackFile/Plot/Laser.png" width="500">
 
 
 ## Steps to follow
-1. Organize input data (tif images) by group and store in respective folder (e.g. `folder name list = ['1', '2', '3', '4', '5','Free','Laser','Control]`) 
-2. Python files Setup
+1. Organize input data (tif images) by group and store in respective folder 
 ```
-## Clone this repository to your folder 
+Folder_Name_List = ['1', '2', '3', '4', '5','Free','Laser','Control]
+```
+
+2. Program Setup
+```
+# Step1 Clone this repository to your folder 
 $ git clone https://github.com/samchen0210/Particle-Tracking-OpenCV.git
 
-## Move current working directory into the folder.
+# Step2 Move current working directory into the folder.
 $ cd Particle-Tracking-OpenCV
 
-## Install package used this project 
+# Step3 Install package used this project 
 $ pip install -r requirements
 
-## Execute main program (data must invovle in the same folder path)
+# Step4 Execute main program (data must invovle in the same folder path)
 $ python main.py
 ```
 3. Analyze dine! Check up the result in `./Export`
