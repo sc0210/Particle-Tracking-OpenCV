@@ -5,6 +5,7 @@ numpy
 #pandas
 scipy
 seaborn
+opencv-python
 
 ##### Image manipulation
 Pillow

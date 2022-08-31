@@ -74,7 +74,17 @@ def IMG2MP4(SrcFolder,OutFolder="./Export",OutName="test",FPS=5):
     cv2.destroyAllWindows()
     video.release()
 
-def PNG2GIF(SrcFolder,OutFolder ,OutName,ImgFormat="png", duration=120):
+def PNG2GIF(SrcFolder,OutFolder,OutName,ImgFormat="png", duration=120):
+    """
+    Convert sequential PNG images into GIF clip format.
+        
+    Args:
+        SrcFolder: (str) input folder locaiton (picture file)
+        OutFolder: (str) output folder location (video file)
+        OutName: (str) AVI clip name
+        ImgFormat:(str, default="png") image's type to be transform
+        duration:(int) GIF clips long
+    """
     frames = [Image.open(image) for image in sorted(glob.glob(f"{SrcFolder}/*.{ImgFormat}"))]
     frame_one = frames[0]
     frame_one.save(f"{OutFolder}/GIF/{OutName}.gif", format="GIF", append_images=frames,
@@ -161,6 +171,16 @@ def xdog_garygrossi(img,sigma=0.5,k=200, gamma=0.98,epsilon=0.1,phi=10):
     return aux*255
 
 def Track(SrcFolder, OutFolder,OutName="test",SavePlot=True):
+    """
+    Track the circle particle in the pictures.
+    Return the track point result in format of two list (x_list, y_list)
+        
+    Args:
+        SrcFolder: (str) input folder locaiton (picture file)
+        OutFolder: (str) output folder location (video file)
+        OutName: (str) AVI clip name
+        SavePlot:(bool) whether to save the reuslts (sequiential figures)
+    """
     Corr =[0,0,0,0,0,0,0] #x1, x2, y1, y2, centerx, centery, radius
     list_x ,list_y = [],[]
 
@@ -247,8 +267,17 @@ def Track(SrcFolder, OutFolder,OutName="test",SavePlot=True):
     return list_x, list_y
 
 def MSD(X ,Y,OutFolder,filename,ImgShow=False):
+    """
+    Plot MSD figure.
+        
+    Args:
+        X:(array) 1-D array of track result
+        Y:(array) 1-D array of track result
+        OutFolder: (str) output folder location
+        FileName: (str) figure name
+        ImgShow: (bool, default="False") Whether the show the figure
+    """
     sol=[];y=[]; length=len(X)
-
     for interval in range(1,length): # Loop interval
         dx1=[];dy1=[];avg_x=0;avg_y=0 
         for i in range(0,length): # Loop in single string
@@ -277,6 +306,16 @@ def MSD(X ,Y,OutFolder,filename,ImgShow=False):
     return sol
 
 def MDD(X, Y,OutFolder,filename,ImgShow=False):
+    """
+    Plot MSD figure.
+        
+    Args:
+        X:(array) 1-D array of track result
+        Y:(array) 1-D array of track result
+        OutFolder: (str) output folder location
+        FileName: (str) figure name
+        ImgShow: (bool, default="False") Whether the show the figure
+    """
     sol=[];y=[]; length=len(X)
     for interval in range(1,length): # Loop interval
         dx1=[];dy1=[];avg_x=0;avg_y=0 
