@@ -24,7 +24,7 @@ $ cd Particle-Tracking-OpenCV
 # Step3 Install package used this project 
 $ pip install -r requirements
 
-# Step4 Execute main program (data must invovle in the same folder path)
+# Step4 Execute main program (data must involve in the same folder path)
 $ python main.py
 ```
 3. Analyze done! Check up the result in `./Export`
