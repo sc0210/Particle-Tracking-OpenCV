@@ -391,7 +391,7 @@ def MSD(X ,Y,OutFolder,filename,ImgShow=False):
     plt.axis([1,length,min(y)*0.8,max(y)*1.2])
     plt.tight_layout()
     
-    fig.savefig(f"{OutFolder}/Plot/{filename}.png")       
+    fig.savefig(f"{OutFolder}/Plot/{filename}.jpg")       
     if ImgShow ==True:
         plt.show()
     return sol
@@ -433,6 +433,6 @@ def MDD(X, Y,OutFolder,filename,ImgShow=False):
     plt.tight_layout()
     if ImgShow ==True:
         plt.show()
-    plt.savefig(f"{OutFolder}/Plot/{filename}.png")  
+    plt.savefig(f"{OutFolder}/Plot/{filename}.jpg")  
 
     return sol

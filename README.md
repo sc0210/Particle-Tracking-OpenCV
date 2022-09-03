@@ -4,7 +4,7 @@
 ## Sample result
 <img src ="./Export/TrackFile/GIF/Track_Free.gif" width="500"> <img src="./Export/TrackFile/GIF/Track_Laser.gif" width="500">
 
-<img src="./Export/TrackFile/Plot/Free.png" width="500"> <img src="./Export/TrackFile/Plot/Laser.png" width="500">
+<img src="./Export/TrackFile/Plot/Free.jpg" width="500"> <img src="./Export/TrackFile/Plot/Laser.jpg" width="500">
 
 
 ## Steps to follow

@@ -17,19 +17,19 @@ MakeSubFolders(Root3, groups) # Create subfolders "ROI", "GIF", "Plot"
 EnvSetup(f'{Root2}/RawData') # Create folder "RawData"
 
 #----Step2:Convert to animation----------------------#
-for index in groups[5:6]:
+for index in groups[:NUM]:
     SrcFolder=f"{Root1}/{index}"
     OutFolder=f"{Root2}/RawData"
     #if _ANI == True|1:
     #    IMG2MP4(SrcFolder, OutFolder, OutName=f'{index}', FPS=5)
 
 #----Step3:Track through ROI-------------------------# 
-for index in groups[5:6]:
+for index in groups[:NUM]:
     SrcFolder1=f"{Root1}/{index}"
     SrcFolder2=f"{Root3}/{index}"
     OutFolder=f"{Root3}"
         
-    X,Y = Track2(SrcFolder1, OutFolder, OutName=f"{index}", SavePlot=_Plot)
+    X,Y = Track(SrcFolder1, OutFolder, OutName=f"{index}", SavePlot=_Plot)
     # MSD(X ,Y, OutFolder, index, ImgShow=False)
     MDD(X ,Y, OutFolder, index, ImgShow=False)
     
