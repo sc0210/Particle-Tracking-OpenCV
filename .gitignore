@@ -1,6 +1,8 @@
 Temp/
 __pycache__/
 plan.md
-main.ipynb
+*.ipynb
+.ipynb_chackpoints
+.github
 *.png
 *.mp4
