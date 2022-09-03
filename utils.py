@@ -266,6 +266,97 @@ def Track(SrcFolder, OutFolder,OutName="test",SavePlot=True):
     print(f"image shape:{image_initial.shape}, ROI:{roi.shape}\n")
     return list_x, list_y
 
+def GetROI(Image): 
+        Corr =[0,0,0,0,0,0,0] #x1, x2, y1, y2, centerx, centery, radius 
+        blur = cv2.medianBlur(Image,3) 
+    
+        #blur = cv2.GaussianBlur(template,(7,7),0)
+        circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT,1,20,param1=50,param2=20,minRadius=5,maxRadius=25)
+        print("////"*18)
+        #print(f"=> Currenet analysis image: {OutName}")
+        if circles is not None:
+            # Get the (x, y, r) as integers
+            circles = np.uint16(np.around(circles))
+            #print(circles)
+            # loop over the circles
+            for i in circles[0,:]:
+                cv2.circle(Image,(i[0],i[1]),i[2],(73, 235, 52),1) # draw outer
+                #cv2.circle(image, center_coordinates, radius, color, thickness)
+                #Thickness of -1 px will fill the circle shape by the specified color.
+                cv2.circle(Image,(i[0],i[1]),1,(255,0,0),1) # draw center
+                interval = 3
+                x1= i[0] - (i[2]+interval); Corr[0]=x1
+                x2= i[0] + (i[2]+interval); Corr[2]=x2
+                y1= i[1] - (i[2]+interval); Corr[1]=y1
+                y2= i[1] + (i[2]+interval); Corr[3]=y2
+                Corr[4]=i[0] # center X
+                Corr[5]=i[1] # center Y
+                Corr[5]=i[2] # circle radius
+                Image = Image[Corr[1]:Corr[3], Corr[0]:Corr[2]]
+                #cv2.imwrite(f"./Export/TrackFile/ROI/ROI_{OutName}.png",Image)
+
+                print(f"CenterX,CenterY:({i[0]},{i[1]}); radius:{i[2]}; x1,y1:({x1},{y1}), (x2,y2):({x2},{y2})")
+        else:
+            print("There is no circles in the picture! Please check~\n")  
+            
+        roi = Image[Corr[1]:Corr[3], Corr[0]:Corr[2]] #26:44,18:34]# opposite input seleciton
+        return roi
+  
+def Track2(SrcFolder, OutFolder,OutName="test",SavePlot=True):
+    """
+    Track the circle particle in the pictures.
+    Return the track point result in format of two list (x_list, y_list)
+        
+    Args:
+        SrcFolder: (str) input folder locaiton (picture file)
+        OutFolder: (str) output folder location (video file)
+        OutName: (str) AVI clip name
+        SavePlot:(bool) whether to save the reuslts (sequiential figures)
+    """
+    list_x ,list_y = [],[]
+
+    #---------NormalXCorr--------------------------------------------------------------------------------
+    for filename in sorted(os.listdir(SrcFolder)):
+        #num1, num2 = str(index).zfill(4), str(index+1).zfill(4)
+        image_initial = np.asarray(ReadGrayImg(f"{SrcFolder}/{filename}", False))
+        image = cv2.medianBlur(image_initial,5)
+        image = xdog_garygrossi(image,sigma=0.5,k=100, gamma=0.98,epsilon=0.1,phi=10)
+                   
+        ## Cross correlation
+        roi = GetROI(image_initial)
+        corr = normxcorr2(roi, image, mode="same")
+        y, x = np.unravel_index(np.argmax(corr), corr.shape)  # find the match
+        list_x.append(x),list_y.append(y)
+    
+    #---------Plot Figure--------------------------------------------------------------------------------    
+    if SavePlot == True | 1:
+
+        for filename in sorted(os.listdir(SrcFolder)):
+            image_initial = np.asarray(ReadGrayImg(f"{SrcFolder}/{filename}", False))            
+            fig, (ax_orig, ax_corr) = plt.subplots(1, 2)
+            ax_orig.imshow(image_initial, cmap="gray")
+            ax_orig.set_title(f'{filename} (Image)')
+            ax_orig.set_axis_off()
+
+            index = sorted(os.listdir(SrcFolder)).index(filename)
+            # Plot xy-center
+            ax_orig.plot(list_x[index], list_y[index],'ro', markersize=10)
+            # Plot whole track
+            ax_orig.plot(list_x[index-5:index+2], list_y[index-5:index+2],'g',marker='.',linewidth="1",markersize=5,alpha=0.8)
+
+            # Plot ROI reference
+            ax_corr.imshow(roi, cmap="gray")
+            ax_corr.set_title(f'No.{filename} (ROI/Template)')
+            ax_corr.set_axis_off()
+
+            filename = filename.replace(".tif","")
+            plt.savefig(f"{OutFolder}/{OutName}/{filename}.png", bbox_inches='tight',fontsize=16)
+            plt.cla()
+            plt.close(fig)         
+    
+    print(f"image shape:{image_initial.shape}, ROI:{roi.shape}\n")
+    return list_x, list_y
+
 def MSD(X ,Y,OutFolder,filename,ImgShow=False):
     """
     Plot MSD figure.
