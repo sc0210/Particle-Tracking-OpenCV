@@ -1,3 +1,4 @@
+from tkinter.tix import Tree
 import cv2, os, glob
 from PIL import Image
 import numpy as np
@@ -170,7 +171,7 @@ def xdog_garygrossi(img,sigma=0.5,k=200, gamma=0.98,epsilon=0.1,phi=10):
                 aux[i][j] = 1 + ht
     return aux*255
 
-def Track(SrcFolder, OutFolder,OutName="test",SavePlot=True):
+def Track(SrcFolder, OutFolder, OutName="test", SavePlot=True):
     """
     Track the circle particle in the pictures.
     Return the track point result in format of two list (x_list, y_list)
@@ -191,7 +192,9 @@ def Track(SrcFolder, OutFolder,OutName="test",SavePlot=True):
     output = cv2.cvtColor(template, cv2.COLOR_GRAY2BGR)
     blur = cv2.medianBlur(template,3)  
     #blur = cv2.GaussianBlur(template,(7,7),0)
-    circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT,1,20,param1=50,param2=20,minRadius=5,maxRadius=25)
+    circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT,\
+                                1,20,param1=50,param2=20,\
+                                minRadius=5,maxRadius=25)
     print("////"*18)
     print(f"=> Currenet analysis image: {OutName}")
     if circles is not None:
@@ -270,42 +273,6 @@ def Track(SrcFolder, OutFolder,OutName="test",SavePlot=True):
     print(f"image shape:{image_initial.shape}, ROI:{roi.shape}\n")
     return list_x, list_y
 
-def GetROI(Image): 
-        Corr =[0,0,0,0,0,0,0] #x1, x2, y1, y2, centerx, centery, radius 
-        blur = cv2.medianBlur(Image,3) 
-    
-        #blur = cv2.GaussianBlur(template,(7,7),0)
-        circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT,1,20,param1=50,param2=20,minRadius=5,maxRadius=25)
-        print("////"*18)
-        #print(f"=> Currenet analysis image: {OutName}")
-        if circles is not None:
-            # Get the (x, y, r) as integers
-            circles = np.uint16(np.around(circles))
-            #print(circles)
-            # loop over the circles
-            for i in circles[0,:]:
-                cv2.circle(Image,(i[0],i[1]),i[2],(73, 235, 52),1) # draw outer
-                #cv2.circle(image, center_coordinates, radius, color, thickness)
-                #Thickness of -1 px will fill the circle shape by the specified color.
-                cv2.circle(Image,(i[0],i[1]),1,(255,0,0),1) # draw center
-                interval = 3
-                x1= i[0] - (i[2]+interval); Corr[0]=x1
-                x2= i[0] + (i[2]+interval); Corr[2]=x2
-                y1= i[1] - (i[2]+interval); Corr[1]=y1
-                y2= i[1] + (i[2]+interval); Corr[3]=y2
-                Corr[4]=i[0] # center X
-                Corr[5]=i[1] # center Y
-                Corr[5]=i[2] # circle radius
-                Image = Image[Corr[1]:Corr[3], Corr[0]:Corr[2]]
-                #cv2.imwrite(f"./Export/TrackFile/ROI/ROI_{OutName}.png",Image)
-
-                print(f"CenterX,CenterY:({i[0]},{i[1]}); radius:{i[2]}; x1,y1:({x1},{y1}), (x2,y2):({x2},{y2})")
-        else:
-            print("There is no circles in the picture! Please check~\n")  
-            
-        roi = Image[Corr[1]:Corr[3], Corr[0]:Corr[2]] #26:44,18:34]# opposite input seleciton
-        return roi
-  
 def Track2(SrcFolder, OutFolder,OutName="test",SavePlot=True):
     """
     Track the circle particle in the pictures.
@@ -319,13 +286,16 @@ def Track2(SrcFolder, OutFolder,OutName="test",SavePlot=True):
     """
     list_x ,list_y = [],[]
 
-    #---------NormalXCorr--------------------------------------------------------------------------------
+    #---------Find circles in images--------------------------------------------------------------------------------
     for filename in sorted(os.listdir(SrcFolder)):
         Corr =[0,0,0,0,0,0,0] #x1, x2, y1, y2, centerx, centery, radius 
         image_initial = np.asarray(ReadGrayImg(f"{SrcFolder}/{filename}", False))
         roi = image_initial.copy()
         blur = cv2.medianBlur(image_initial,3) 
-        circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT,1,20,param1=65,param2=20,minRadius=5,maxRadius=15)
+        circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT,1,20,\
+                                param1=60,param2=20,\
+                                minRadius=3,maxRadius=15)
+        #https://docs.opencv.org/4.x/dd/d1a/group__imgproc__feature.html#ga47849c3be0d0406ad3ca45db65a25d2d
         print("////"*18)
         #print(f"=> Currenet analysis image: {OutName}")
         
@@ -349,37 +319,49 @@ def Track2(SrcFolder, OutFolder,OutName="test",SavePlot=True):
                 Corr[5]=i[2] # circle radius
                 ROI = image_initial[Corr[1]:Corr[3], Corr[0]:Corr[2]]
                 filename = filename.replace(".tif","")
-                cv2.imwrite(f"./Export/TrackFile/ROI/Free/{filename}.png",ROI)
+                cv2.imwrite(f"{SrcFolder}/{ROI}/{filename}.png",ROI)
 
-                print(f"CenterX,CenterY:({i[0]},{i[1]}); radius:{i[2]}; x1,y1:({x1},{y1}), (x2,y2):({x2},{y2})")
+                print(f"CenterX,CenterY:({i[0]},{i[1]}); radius:{i[2]}; (x1,y1):({x1},{y1}), (x2,y2):({x2},{y2})")
+
+                #---------NormalXCorr if there exists circles------------------------------------------------       
+                ROI = np.asarray(cv2.adaptiveThreshold(ROI,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
+                    cv2.THRESH_BINARY, 11, 2))
+                image = np.asarray(cv2.adaptiveThreshold(image_initial,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
+                    cv2.THRESH_BINARY, 11, 2))
+                
+                corr = normxcorr2(ROI, image, mode="same")
+                y, x = np.unravel_index(np.argmax(corr), corr.shape)  # find the match
+                list_x.append(x),list_y.append(y)
         else:
-            ROI = image_initial
-            filename = filename.replace(".tif","")
-            cv2.imwrite(f"./Export/TrackFile/ROI/Free/{filename}.png",ROI)
+            # Section of dealing the the tracking lost
+            ## Current solution -> do   
+            #ROI = image_initial
+            #filename = filename.replace(".tif","")
+            #cv2.imwrite(f"./Export/TrackFile/ROI/Free/{filename}.png",ROI)
             print("There is no circles in the picture! Please check~\n")
             # Assign ROI to the former one  
-           
-        ROI = cv2.threshold(ROI,127,255,cv2.THRESH_BINARY)
-        image = cv2.threshold(image_initial,127,255,cv2.THRESH_BINARY)
 
-        #image = xdog_garygrossi(image,sigma=0.5,k=100, gamma=0.98,epsilon=0.1,phi=10)
-                   
-        ## Cross correlation
+    #---------NormalXCorr--------------------------------------------------------------------------------       
+    '''
+    ROI = np.asarray(cv2.adaptiveThreshold(ROI,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
+            cv2.THRESH_BINARY, 11, 2))
+        image = np.asarray(cv2.adaptiveThreshold(image_initial,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
+            cv2.THRESH_BINARY, 11, 2))
+        
         corr = normxcorr2(ROI, image, mode="same")
         y, x = np.unravel_index(np.argmax(corr), corr.shape)  # find the match
         list_x.append(x),list_y.append(y)
+    ''' 
     #---------Save2Excel--------------------------------------------------------------------------------    
     data = pd.DataFrame({'x_axis': list_x,'Y_axis':list_y})
     data.to_excel(f"{OutFolder}/{OutName}.xlsx", sheet_name='XY', index=False)
-    
-    #---------Plot Figure--------------------------------------------------------------------------------    
-    
-    if SavePlot == False | 1:
 
-        for filename in sorted(os.listdir(SrcFolder)):
+    #---------Plot Figure--------------------------------------------------------------------------------    
+    if SavePlot == False | 1:
+        for filename in sorted(SrcFolder):
             filename =filename.replace(".tif", "")
             image_initial = np.asarray(Image.open(f"{SrcFolder}/{filename}.tif"))
-            ROI_initial = np.array(Image.open(f"./Export/TrackFile/ROI/Free/{filename}.png"))
+            ROI_initial = np.asarray(Image.open(f"{SrcFolder}/{ROI}/{filename}.png"))
 
             fig, (ax_orig, ax_corr) = plt.subplots(1, 2)
             ax_orig.imshow(image_initial,cmap="gray")
@@ -444,7 +426,7 @@ def MSD(X ,Y,OutFolder,filename,ImgShow=False):
         plt.show()
     return sol
 
-def MDD(X, Y,OutFolder,filename,ImgShow=False):
+def MDD(X, Y,FPS,OutFolder,filename,ImgShow=False):
     """
     Plot MSD figure.
         
@@ -455,7 +437,7 @@ def MDD(X, Y,OutFolder,filename,ImgShow=False):
         FileName: (str) figure name
         ImgShow: (bool, default="False") Whether the show the figure
     """
-    sol=[];y=[]; length=len(X)
+    sol=[]; length=len(X)
     for interval in range(1,length): # Loop interval
         dx1=[];dy1=[];avg_x=0;avg_y=0 
         for i in range(0,length): # Loop in single string
@@ -469,16 +451,19 @@ def MDD(X, Y,OutFolder,filename,ImgShow=False):
    
     sns.set_theme(color_codes=True)
     fig = plt.figure(figsize=(8,5))
-    fig =sns.regplot(x=np.linspace(1,length-1,length-1),
-                y=sol, marker='o', label="example",
-                robust=False, ci=95,
+    fig =sns.regplot(x = np.linspace(0,(length-1)/FPS, num=length-1),
+                y=sol, marker='o', label="example",order=1,
+                robust=False, ci=None,
                 scatter_kws={'s': 10, 'color':'#46b4b4'},
                 line_kws={'lw': 2, 'color': '#b4466e'}) 
+    ## Seaborn Resources
+    #https://seaborn.pydata.org/generated/seaborn.regplot.html
+    # Robust: bool, will de-weight outliers
     fig.figure.autofmt_xdate()
-    plt.title(f'Linear Regression of {filename}',fontsize=18)
-    plt.xlabel("Time interval",fontsize=18) 
-    plt.ylabel("MSD",fontsize=18)
-    plt.tight_layout()
+    plt.title(f'Linear Regression of <{filename}>',fontsize=18)
+    plt.xlabel("t (sec)",fontsize=18) 
+    plt.ylabel("Delta X^2 (Pixel^2)",fontsize=18)
+    #plt.tight_layout()
     if ImgShow ==True:
         plt.show()
     plt.savefig(f"{OutFolder}/Plot/{filename}.jpg")  
