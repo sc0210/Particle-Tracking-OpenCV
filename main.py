@@ -30,8 +30,9 @@ for index in groups[:NUM]:
     OutFolder=f"{Root3}"
         
     X,Y = Track(SrcFolder1, OutFolder, OutName=f"{index}", SavePlot=_Plot)
-    # MSD(X ,Y, OutFolder, index, ImgShow=False)
-    MDD(X ,Y, OutFolder, index, ImgShow=False)
+    FPS =100
+    #MSD(X,Y,FPS, OutFolder, index, ImgShow=False)
+    MDD(X ,Y,FPS, OutFolder, index, ImgShow=False)
     
     if _Export  == True|1:
         print(f"=> Converting into animation...")
