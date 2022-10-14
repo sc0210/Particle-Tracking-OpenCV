@@ -29,9 +29,10 @@ $ python main.py
 ```
 3. Analyze done! Check up the result in `./Export`
 
-## Current updated ***(9/6)***
+## Current updated ***(10/14)***
 1. Add different mode of tracking methods
 2. Add export excel sheet of particle tracking results
+3. Revised the computing algorithm
 
 ## Check list  
 ***(last updated 8/24***)

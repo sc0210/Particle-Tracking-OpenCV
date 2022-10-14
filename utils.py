@@ -1,5 +1,6 @@
-from tkinter.tix import Tree
-import cv2, os, glob
+import cv2
+import os
+import glob
 from PIL import Image
 import numpy as np
 import pandas as pd
@@ -273,160 +274,7 @@ def Track(SrcFolder, OutFolder, OutName="test", SavePlot=True):
     print(f"image shape:{image_initial.shape}, ROI:{roi.shape}\n")
     return list_x, list_y
 
-def Track2(SrcFolder, OutFolder,OutName="test",SavePlot=True):
-    """
-    Track the circle particle in the pictures.
-    Return the track point result in format of two list (x_list, y_list)
-        
-    Args:
-        SrcFolder: (str) input folder locaiton (picture file)
-        OutFolder: (str) output folder location (video file)
-        OutName: (str) AVI clip name
-        SavePlot:(bool) whether to save the reuslts (sequiential figures)
-    """
-    list_x ,list_y = [],[]
-
-    #---------Find circles in images--------------------------------------------------------------------------------
-    for filename in sorted(os.listdir(SrcFolder)):
-        Corr =[0,0,0,0,0,0,0] #x1, x2, y1, y2, centerx, centery, radius 
-        image_initial = np.asarray(ReadGrayImg(f"{SrcFolder}/{filename}", False))
-        roi = image_initial.copy()
-        blur = cv2.medianBlur(image_initial,3) 
-        circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT,1,20,\
-                                param1=60,param2=20,\
-                                minRadius=3,maxRadius=15)
-        #https://docs.opencv.org/4.x/dd/d1a/group__imgproc__feature.html#ga47849c3be0d0406ad3ca45db65a25d2d
-        print("////"*18)
-        #print(f"=> Currenet analysis image: {OutName}")
-        
-        if circles is not None:
-            # Get the (x, y, r) as integers
-            circles = np.uint16(np.around(circles))
-            #print(circles)
-            # loop over the circles
-            for i in circles[0,:]:
-                cv2.circle(roi,(i[0],i[1]),i[2],(73, 235, 52),1) # draw outer
-                #cv2.circle(image, center_coordinates, radius, color, thickness)
-                #Thickness of -1 px will fill the circle shape by the specified color.
-                cv2.circle(roi,(i[0],i[1]),1,(255,0,0),1) # draw center
-                interval = 3
-                x1= i[0] - (i[2]+interval); Corr[0]=x1
-                x2= i[0] + (i[2]+interval); Corr[2]=x2
-                y1= i[1] - (i[2]+interval); Corr[1]=y1
-                y2= i[1] + (i[2]+interval); Corr[3]=y2
-                Corr[4]=i[0] # center X
-                Corr[5]=i[1] # center Y
-                Corr[5]=i[2] # circle radius
-                ROI = image_initial[Corr[1]:Corr[3], Corr[0]:Corr[2]]
-                filename = filename.replace(".tif","")
-                cv2.imwrite(f"{SrcFolder}/{ROI}/{filename}.png",ROI)
-
-                print(f"CenterX,CenterY:({i[0]},{i[1]}); radius:{i[2]}; (x1,y1):({x1},{y1}), (x2,y2):({x2},{y2})")
-
-                #---------NormalXCorr if there exists circles------------------------------------------------       
-                ROI = np.asarray(cv2.adaptiveThreshold(ROI,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
-                    cv2.THRESH_BINARY, 11, 2))
-                image = np.asarray(cv2.adaptiveThreshold(image_initial,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
-                    cv2.THRESH_BINARY, 11, 2))
-                
-                corr = normxcorr2(ROI, image, mode="same")
-                y, x = np.unravel_index(np.argmax(corr), corr.shape)  # find the match
-                list_x.append(x),list_y.append(y)
-        else:
-            # Section of dealing the the tracking lost
-            ## Current solution -> do   
-            #ROI = image_initial
-            #filename = filename.replace(".tif","")
-            #cv2.imwrite(f"./Export/TrackFile/ROI/Free/{filename}.png",ROI)
-            print("There is no circles in the picture! Please check~\n")
-            # Assign ROI to the former one  
-
-    #---------NormalXCorr--------------------------------------------------------------------------------       
-    '''
-    ROI = np.asarray(cv2.adaptiveThreshold(ROI,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
-            cv2.THRESH_BINARY, 11, 2))
-        image = np.asarray(cv2.adaptiveThreshold(image_initial,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
-            cv2.THRESH_BINARY, 11, 2))
-        
-        corr = normxcorr2(ROI, image, mode="same")
-        y, x = np.unravel_index(np.argmax(corr), corr.shape)  # find the match
-        list_x.append(x),list_y.append(y)
-    ''' 
-    #---------Save2Excel--------------------------------------------------------------------------------    
-    data = pd.DataFrame({'x_axis': list_x,'Y_axis':list_y})
-    data.to_excel(f"{OutFolder}/{OutName}.xlsx", sheet_name='XY', index=False)
-
-    #---------Plot Figure--------------------------------------------------------------------------------    
-    if SavePlot == False | 1:
-        for filename in sorted(SrcFolder):
-            filename =filename.replace(".tif", "")
-            image_initial = np.asarray(Image.open(f"{SrcFolder}/{filename}.tif"))
-            ROI_initial = np.asarray(Image.open(f"{SrcFolder}/{ROI}/{filename}.png"))
-
-            fig, (ax_orig, ax_corr) = plt.subplots(1, 2)
-            ax_orig.imshow(image_initial,cmap="gray")
-            ax_orig.set_title(f'{filename} (Image)')
-            ax_orig.set_axis_off()
-
-            index = sorted(os.listdir(SrcFolder)).index(f"{filename}.tif")
-            # Plot xy-center
-            ax_orig.plot(list_x[index], list_y[index],'ro', markersize=10)
-            # Plot whole track
-            ax_orig.plot(list_x[index-5:index+2], list_y[index-5:index+2],'g',marker='.',linewidth="1",markersize=5,alpha=0.8)
-
-            # Plot ROI reference
-            ax_corr.imshow(ROI_initial,cmap="gray")
-            ax_corr.set_title(f'No.{filename} (ROI/Template)')
-            ax_corr.set_axis_off()
-
-            filename = filename.replace(".tif","")
-            plt.savefig(f"{OutFolder}/{OutName}/{filename}.png", bbox_inches='tight',fontsize=16)
-            plt.cla()
-            plt.close(fig)         
-    
-    print(f"image shape:{image_initial.shape}, ROI:{roi.shape}\n")
-    return list_x, list_y
-
-def MSD(X ,Y,OutFolder,filename,ImgShow=False):
-    """
-    Plot MSD figure.
-        
-    Args:
-        X:(array) 1-D array of track result
-        Y:(array) 1-D array of track result
-        OutFolder: (str) output folder location
-        FileName: (str) figure name
-        ImgShow: (bool, default="False") Whether the show the figure
-    """
-    sol=[];y=[]; length=len(X)
-    for interval in range(1,length): # Loop interval
-        dx1=[];dy1=[];avg_x=0;avg_y=0 
-        for i in range(0,length): # Loop in single string
-            if (i+interval) < length:
-                dx1.append(int(X[i+interval] - X[i]) **2)
-                dy1.append(int(Y[i+interval] - Y[i]) **2)
-        #print(dx1,dy1)
-        avg_x,avg_y = round(sum(dx1)/len(dx1),4),round(sum(dy1)/len(dy1),4)
-        sol.append(avg_x + avg_y)
-        #print(avg_x,avg_y)
-    
-    y = sol
-    x = np.linspace(1,length-1,length-1)
-    
-    fig = plt.subplots(figsize=(8,5))
-    plt.plt(x,y)
-    plt.title(f"{filename}",fontsize=18)
-    plt.xlabel("Time interval",fontsize=18) 
-    plt.ylabel("MSD",fontsize=18)
-    plt.axis([1,length,min(y)*0.8,max(y)*1.2])
-    plt.tight_layout()
-    
-    fig.savefig(f"{OutFolder}/Plot/{filename}.jpg")       
-    if ImgShow ==True:
-        plt.show()
-    return sol
-
-def MDD(X, Y,FPS,OutFolder,filename,ImgShow=False):
+def MSD(X, Y,FPS,OutFolder,filename,ImgShow=False):
     """
     Plot MSD figure.
         
@@ -469,3 +317,109 @@ def MDD(X, Y,FPS,OutFolder,filename,ImgShow=False):
     plt.savefig(f"{OutFolder}/Plot/{filename}.jpg")  
 
     return sol
+
+def GetCenter(Image_path, OutName):
+    #OutName = Image_path.split("/")[-1].split(".")[0]
+    Corr =[0,0,0,0,0,0,0] # (x1, x2, y1, y2, centerx, centery, radius)
+    Result = [0, 0] # get (X,Y) from HoughCircles
+
+    template = cv2.imread(f"{Image_path}",0) # Read Gray Image        
+    output = cv2.cvtColor(template, cv2.COLOR_GRAY2BGR)
+    blur = cv2.medianBlur(template,3)  
+    #blur = cv2.GaussianBlur(template,(7,7),0)
+    circles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT,1,20,\
+                    param1=50,param2=20,minRadius=5,maxRadius=16)
+
+    print("////"*18)
+    print(f"=> Currenet analysis image: {OutName}")
+    
+    if circles is not None:
+        circles = np.uint16(np.around(circles))
+        for i in circles[0,:]:
+            cv2.circle(output,(i[0],i[1]),i[2],(73, 235, 52),1) # draw outer
+            #cv2.circle(image, center_coordinates, radius, color, thickness)
+            #Thickness of -1 px will fill the circle shape by the specified color.
+            cv2.circle(output,(i[0],i[1]),1,(255,0,0),1) # draw center
+            interval = 5
+            x1 = i[0] - (i[2]+interval); Corr[0]=x1
+            x2 = i[0] + (i[2]+interval); Corr[2]=x2
+            y1 = i[1] - (i[2]+interval); Corr[1]=y1
+            y2 = i[1] + (i[2]+interval); Corr[3]=y2
+            Corr[4] = i[0] # center X
+            Corr[5] = i[1] # center Y
+            Corr[5] = i[2] # circle radius
+            output = output[Corr[1]:Corr[3], Corr[0]:Corr[2]]
+            cv2.imwrite(f"./Export/TrackFile/ROI/ROI_{OutName}.png",output)
+
+            print(f"=> Results: CenterX,CenterY: ({i[0]},{i[1]}) | radius:{i[2]}\n")
+            Result[0]=i[0]; Result[1]=i[1]
+            return Result
+    else:
+        print("There is no circles in the picture! Please check~\n") 
+
+def SeqNCC(TrackX,TrackY,idx,root,DstFolder,image_name):
+    # Current analysis image index
+    image_name = image_name.replace(".tif","")
+    roi_image = sorted(os.listdir(root))[idx]
+    roi_initial = np.asarray(cv2.imread(f"{root}/{roi_image}", cv2.IMREAD_GRAYSCALE))
+    image_initial = np.asarray(cv2.imread(f"{root}/{image_name}.tif",cv2.IMREAD_GRAYSCALE)) 
+
+    BBOX_size = 14 # Including radius and padding
+    x1 = TrackX[idx] - BBOX_size; x2 = TrackX[idx] + BBOX_size
+    y1 = TrackY[idx] - BBOX_size; y2 = TrackY[idx] + BBOX_size
+    #print(f"x1:{x1}, x2:{x2}, y1:{y1}, y2:{y2}")
+    
+    ## Cross correlation
+    image_blur = cv2.medianBlur(image_initial,1)
+    roi = roi_initial[y1:y2, x1:x2]
+    roi_blur = cv2.medianBlur(roi,1)
+
+    # cv2.imwrite(f"./Export/TrackFile/ROI/Test/{image_name}.png",roi)
+    corr = normxcorr2(roi_blur, image_blur, mode="same")
+    y, x = np.unravel_index(np.argmax(corr), corr.shape)  # find the match
+    
+    ## Plot the Track point(X,Y) overlays with original pictures
+    fig, (ax_orig, ax_corr) = plt.subplots(1, 2)
+    ax_orig.imshow(image_initial, cmap="gray")
+    ax_orig.set_title(f'{image_name} (Image)')
+    ax_orig.set_axis_off()
+
+    # Plot xy-center
+    ax_orig.plot(x, y,'ro', markersize = 6)
+    # Plot whole track
+    ax_orig.plot(TrackX[idx-5:idx+2], TrackY[idx-5:idx+2],'g',marker='.',linewidth="1",markersize=5,alpha=0.8)
+
+    # Plot ROI reference
+    ax_corr.imshow(roi, cmap="gray")
+    ax_corr.set_title(f"No.{image_name} (ROI/Template)")
+    ax_corr.set_axis_off()
+
+    plt.savefig(f"{DstFolder}/{image_name}.png", bbox_inches='tight')
+    plt.cla()
+    plt.close(fig)    
+    return x,y
+
+def Test(SrcFolder,DstFolder,GroupIndex):
+    root = f"{SrcFolder}/{GroupIndex}"
+    TrackX,TrackY =[],[]
+    first_image_name = sorted(os.listdir(root))[0:1]
+
+    TrackResult =  GetCenter(f"{root}/{''.join(first_image_name)}",GroupIndex) # Return X,Y from first picture
+    TrackX.append(TrackResult[0]); TrackY.append(TrackResult[1])
+    #print(f"=> TrackX:{TrackX}, TrackY:{TrackY}")
+
+    for image in sorted(os.listdir(root))[1:]:
+        prev_idx = sorted(os.listdir(root)).index(image) -1 # Use previous image as NormalCorrelation    
+        
+        if prev_idx < len(os.listdir(root)):
+            x,y = SeqNCC(TrackX, TrackY, prev_idx,root,DstFolder, image) # idx stands for the former one (ROI)
+            #print(f"x:{x}, y:{y}")
+            TrackX.append(x)
+            TrackY.append(y)
+    
+    #---------Save2Excel--------------------------------------------------------------------------------    
+    data = pd.DataFrame({'x_axis': TrackX,'Y_axis':TrackY})
+    data.to_excel(f"{DstFolder}/{GroupIndex}.xlsx", sheet_name='XY', index=False)
+
+    return TrackX,TrackY
+

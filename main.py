@@ -1,4 +1,5 @@
 import argparse
+
 parser = argparse.ArgumentParser(description='test')
 parser.add_argument('-a','--Animation',type=int,default=True, help='Convert sequence of images into .mp4')
 parser.add_argument('-s','--SaveFig',type=int,default=True, help='Save plot results')
@@ -7,6 +8,7 @@ args = parser.parse_args()
 _ANI,_Plot,_Export = args.Animation, args.SaveFig, args.ExportVid
 
 from utils import *
+
 #----Step1:ROOT folder/Envs setup---------------------#
 Root1 = "./Brownian_motion"
 Root2 = "./Export";  Root3 = f'{Root2}/TrackFile'
@@ -20,19 +22,23 @@ EnvSetup(f'{Root2}/RawData') # Create folder "RawData"
 for index in groups[:NUM]:
     SrcFolder=f"{Root1}/{index}"
     OutFolder=f"{Root2}/RawData"
-    #if _ANI == True|1:
-    #    IMG2MP4(SrcFolder, OutFolder, OutName=f'{index}', FPS=5)
+    # if _ANI == True|1:
+        # IMG2MP4(SrcFolder, OutFolder, OutName=f'{index}', FPS=5)
 
 #----Step3:Track through ROI-------------------------# 
 for index in groups[:NUM]:
+    tempdir = "Reserverd"
     SrcFolder1=f"{Root1}/{index}"
-    SrcFolder2=f"{Root3}/{index}"
+    SrcFolder2=f"{Root3}/{tempdir}/{index}"
     OutFolder=f"{Root3}"
+
+    _SrcFolder = "./Brownian_motion"
+    DstFolder = f"./Export/TrackFile/{tempdir}/{index}"
         
-    X,Y = Track(SrcFolder1, OutFolder, OutName=f"{index}", SavePlot=_Plot)
+    #X,Y = Track(SrcFolder1, OutFolder, OutName=f"{index}", SavePlot=_Plot)
+    X,Y = Test(_SrcFolder, DstFolder, GroupIndex=f"{index}")
     FPS =100
-    #MSD(X,Y,FPS, OutFolder, index, ImgShow=False)
-    MDD(X ,Y,FPS, OutFolder, index, ImgShow=False)
+    MSD(X ,Y,FPS, OutFolder, index, ImgShow=False)
     
     if _Export  == True|1:
         print(f"=> Converting into animation...")
