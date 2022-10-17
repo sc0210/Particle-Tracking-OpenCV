@@ -13,13 +13,14 @@ from utils import *
 Root1 = "./Brownian_motion"
 Root2 = "./Export"
 Root3 = "./Export/TrackFile/Reserved"
-subfolders = ['ROI','GIF','Plot','Reserved']
+subfolders = ['RawData','TrackFile']
 groups = ['1', '2', '3', '4', '5','Free','Laser'] # Named after exp. group
 NUM = len(groups) # 7 experiments in total
 
-EnvSetup(f'./Export/RawData') # Create folder "RawData"
-MakeSubFolders(f'./Export/TrackFile', subfolders) # Create subfolders "ROI", "GIF", "Plot"
-MakeSubFolders(f'./Export/TrackFile/Reserved', groups) # Create subfolders "ROI", "GIF", "Plot"
+for idx in subfolders:
+    EnvSetup(f'./Export/{idx}') # Create subfolders "RawData", "TrackFile"
+MakeSubFolders(f'./Export/TrackFile', subfolders) # Create subfolders "ROI", "GIF", "Plot" ,"Reserved"
+MakeSubFolders(f'./Export/TrackFile/Reserved', groups) # Create subfolders "1", "2","3"...
 
 #----Step2:Convert to animation----------------------#
 for index in groups[:NUM]:
@@ -32,7 +33,7 @@ for index in groups[:NUM]:
 for index in groups[:NUM]:
     _SrcFolder = "./Brownian_motion" 
     _DstFolder = "./Export/TrackFile/Reserved" 
-    METHOD = 1
+    METHOD = 2
 
     if METHOD == 1:
         X,Y = Track(_SrcFolder, _DstFolder, GroupIndex=index, SavePlot=_Plot)   
