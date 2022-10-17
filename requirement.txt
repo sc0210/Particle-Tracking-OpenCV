@@ -1,0 +1,11 @@
+##### Core scientific packages
+#jupyter
+matplotlib
+numpy
+#pandas
+scipy
+seaborn
+opencv-python
+
+##### Image manipulation
+Pillow
