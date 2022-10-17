@@ -7,3 +7,7 @@ plan.md
 *.png
 *.mp4
 *.xlsx
+Export/TrackFile/GIF/
+Export/TrackFile/Plot/
+Export/TrackFile/ROI/
+Brownian_motion/
