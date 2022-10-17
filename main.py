@@ -13,11 +13,13 @@ from utils import *
 Root1 = "./Brownian_motion"
 Root2 = "./Export"
 Root3 = "./Export/TrackFile/Reserved"
-subfolders = ['RawData','TrackFile']
+folders = ['RawData','TrackFile']
+subfolders = ["ROI", "GIF", "Plot" ,"Reserved"]
 groups = ['1', '2', '3', '4', '5','Free','Laser'] # Named after exp. group
 NUM = len(groups) # 7 experiments in total
 
-for idx in subfolders:
+EnvSetup(f'./Export')
+for idx in folders:
     EnvSetup(f'./Export/{idx}') # Create subfolders "RawData", "TrackFile"
 MakeSubFolders(f'./Export/TrackFile', subfolders) # Create subfolders "ROI", "GIF", "Plot" ,"Reserved"
 MakeSubFolders(f'./Export/TrackFile/Reserved', groups) # Create subfolders "1", "2","3"...
