@@ -406,11 +406,14 @@ def Track2(SrcFolder,DstFolder,GroupIndex):
     root = f"{SrcFolder}/{GroupIndex}"
     TrackX,TrackY =[],[]
     first_image_name = sorted(os.listdir(root))[0:1]
-
-    TrackResult =  GetCenter(f"{root}/{''.join(first_image_name)}",GroupIndex) # Return X,Y from first picture
-    TrackX.append(TrackResult[0]); TrackY.append(TrackResult[1])
+    
+    # Return X,Y from first picture
+    TrackResult =  GetCenter(f"{root}/{''.join(first_image_name)}",GroupIndex) 
+    TrackX.append(TrackResult[0])
+    TrackY.append(TrackResult[1])
     #print(f"=> TrackX:{TrackX}, TrackY:{TrackY}")
 
+    # Rest sequential image will track by the former image
     for image in sorted(os.listdir(root))[1:]:
         prev_idx = sorted(os.listdir(root)).index(image) -1 # Use previous image as NormalCorrelation    
         
