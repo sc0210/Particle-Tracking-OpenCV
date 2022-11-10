@@ -12,3 +12,4 @@ Export/TrackFile/Plot/
 Export/TrackFile/ROI/
 Brownian_motion/
 Track.py
+.DS_Store
