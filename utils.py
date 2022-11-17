@@ -28,11 +28,11 @@ def MakeSubFolders(root_dir, subfolders):
 
 def ReadGrayImg(SrcPath, show=False):
     """
-    Read an image.
+    Read an gray image and option either to show on the window.
 
     Args:
-        SrcPath:(str)image path
-        show:(bool)show the image on the screen
+        SrcPath:(str) image path
+        show:(bool) show the image on the window
     """
     Img = cv2.imread(SrcPath, cv2.IMREAD_GRAYSCALE)
     if show == True:
@@ -163,35 +163,6 @@ def normxcorr2(template, image, mode="full"):
     return out
 
 
-def dog(img, size=(0, 0), k=1.6, sigma=0.5, gamma=1):
-    img1 = cv2.GaussianBlur(img, size, sigma)
-    img2 = cv2.GaussianBlur(img, size, sigma*k)
-    return (img1-gamma*img2)
-
-
-def xdog(img, sigma=0.5, k=1.6, gamma=1, epsilon=1, phi=1):
-    aux = dog(img, sigma=sigma, k=k, gamma=gamma)/255
-    for i in range(0, aux.shape[0]):
-        for j in range(0, aux.shape[1]):
-            if (aux[i, j] < epsilon):
-                aux[i, j] = 1*255
-            else:
-                aux[i, j] = 255*(1 + np.tanh(phi*(aux[i, j])))
-    return aux
-
-
-def xdog_garygrossi(img, sigma=0.5, k=200, gamma=0.98, epsilon=0.1, phi=10):
-    aux = dog(img, sigma=sigma, k=k, gamma=gamma)/255
-    for i in range(0, aux.shape[0]):
-        for j in range(0, aux.shape[1]):
-            if (aux[i, j] >= epsilon):
-                aux[i, j] = 1
-            else:
-                ht = np.tanh(phi*(aux[i][j] - epsilon))
-                aux[i][j] = 1 + ht
-    return aux*255
-
-
 def Track(SrcFolder, DstFolder, GroupIndex, SavePlot=True):
     """
     Track the circle particle in the pictures.
@@ -251,7 +222,6 @@ def Track(SrcFolder, DstFolder, GroupIndex, SavePlot=True):
 
     roi_initial = template.copy()
     roi = cv2.medianBlur(roi_initial, 5)
-    #roi = xdog_garygrossi(roi,sigma=0.5,k=100, gamma=0.98,epsilon=0.1,phi=10)
     roi = roi[Corr[1]:Corr[3], Corr[0]:Corr[2]]
     progress =tqdm(total=len(os.listdir(f"{SrcFolder}/{GroupIndex}")))
     times = 0
@@ -260,7 +230,6 @@ def Track(SrcFolder, DstFolder, GroupIndex, SavePlot=True):
     for filename in sorted(os.listdir(f"{SrcFolder}/{GroupIndex}")):
         image_initial = ReadGrayImg(f"{SrcFolder}/{GroupIndex}/{filename}", False)
         image = cv2.medianBlur(image_initial, 5)
-        #image = xdog_garygrossi(image_initial ,sigma=0.5,k=100, gamma=0.98,epsilon=0.1,phi=10)
 
         # Cross correlation
         corr = normxcorr2(roi, image, mode="same")
@@ -308,7 +277,7 @@ def Track(SrcFolder, DstFolder, GroupIndex, SavePlot=True):
 
 def MSD(X, Y, FPS, DstFolder, GroupIndex, ImgShow=False):
     """
-    Plot MSD figure.
+    Plot Mean Square Displacement(MSD) figure.
 
     Args:
         X:(array) 1-D array of track result
@@ -320,13 +289,13 @@ def MSD(X, Y, FPS, DstFolder, GroupIndex, ImgShow=False):
     print(f"=> Calculating MSD...")
     sol = []
     length = len(X)
-    count = 0
-    LAG = 50
+    count,LAG =0, 5
+
     for interval in range(1, length, LAG):  # Loop interval
         dx1, dy1 = [], []
         avg_x, avg_y = 0, 0
         for i in range(0, length):  # Loop in single string
-            if (i+interval) < length-100:
+            if (i+interval) < length:
                 dx1.append(int(X[i+interval] - X[i]) ** 2)
                 dy1.append(int(Y[i+interval] - Y[i]) ** 2)
         count += 1
@@ -342,7 +311,7 @@ def MSD(X, Y, FPS, DstFolder, GroupIndex, ImgShow=False):
     fig = sns.regplot(x=np.linspace(0, (count-1)/FPS, count),
         y=sol, marker='o', label="example", order=1,
         robust=False, ci=None,     
-        scatter_kws={'s': 10, 'color': '#46b4b4'},
+        scatter_kws={'s': 10, 'color': '#7d46b4'},
         line_kws={'lw': 2, 'color': '#b4466e'})
     # Seaborn Resources
     # https://seaborn.pydata.org/generated/seaborn.regplot.html
@@ -360,6 +329,13 @@ def MSD(X, Y, FPS, DstFolder, GroupIndex, ImgShow=False):
 
 
 def GetCenter(Image_path, OutName):
+    """
+    Track single frame based on HoughCircles algorithm from OpenCV.
+
+    Args:
+        Image_path:(str) image path
+        OutName:(str) name for the output filename
+    """
     #OutName = Image_path.split("/")[-1].split(".")[0]
     Corr = [0, 0, 0, 0, 0, 0, 0]  # (x1, x2, y1, y2, centerx, centery, radius)
     Result = [0, 0]  # get (X,Y) from HoughCircles
@@ -388,16 +364,12 @@ def GetCenter(Image_path, OutName):
             y1 = i[1] - (i[2]+interval)
             y2 = i[1] + (i[2]+interval)
             Corr[1], Corr[0], Corr[2], Corr[3] = y1, x1, x2, y2
-            Corr[4] = i[0]  # center X
-            Corr[5] = i[1]  # center Y
-            Corr[6] = i[2]  # circle radius
+            Corr[4], Corr[5], Corr[6] = i[0], i[1], i[2]  # center X, center Y, circle radius
             output = output[Corr[1]:Corr[3], Corr[0]:Corr[2]]
             cv2.imwrite(f"./Export/TrackFile/ROI/ROI_{OutName}.png", output)
 
-            print(
-                f"=> Results: CenterX,CenterY: ({i[0]},{i[1]}) | radius:{i[2]}\n")
-            Result[0] = i[0]
-            Result[1] = i[1]
+            print(f"=> Results: CenterX,CenterY: ({i[0]},{i[1]}) | radius:{i[2]}\n")
+            Result[0], Result[1] = i[0], i[1]
             return Result
     else:
         print("There is no circles in the picture! Please check~\n")
@@ -411,13 +383,23 @@ def Threshold(image, algo=cv2.THRESH_OTSU):
 
 
 def SeqNCC(TrackX, TrackY, idx, root, DstFolder, GroupIndex, image_name):
-    # Current analysis image index
+    """
+    Track sequence of the image and save in TrackX, TrackY
+
+    Args:
+        TrackX(str):
+        TrackY(str):
+        idx(int): 
+        root(str): 
+        DstFolder(str): 
+        GroupIndex(int):
+        image_name(str):
+    """
+    # --------Current analysis image index------------------------------------------------------------
     image_name = image_name.replace(".tif", "")
     roi_image = sorted(os.listdir(root))[idx]
-    roi_initial = np.asarray(cv2.imread(
-        f"{root}/{roi_image}", cv2.IMREAD_GRAYSCALE))
-    image_initial = np.asarray(cv2.imread(
-        f"{root}/{image_name}.tif", cv2.IMREAD_GRAYSCALE))
+    roi_initial = np.asarray(cv2.imread(f"{root}/{roi_image}", cv2.IMREAD_GRAYSCALE))
+    image_initial = np.asarray(cv2.imread(f"{root}/{image_name}.tif", cv2.IMREAD_GRAYSCALE))
 
     BBOX_size = 14  # Including radius and padding
     x1 = TrackX[idx] - BBOX_size
@@ -426,7 +408,7 @@ def SeqNCC(TrackX, TrackY, idx, root, DstFolder, GroupIndex, image_name):
     y2 = TrackY[idx] + BBOX_size
     #print(f"x1:{x1}, x2:{x2}, y1:{y1}, y2:{y2}")
 
-    # Cross correlation
+    # --------Cross correlation------------------------------------------------------------------------
     roi = roi_initial[y1:y2, x1:x2]
     th3 = Threshold(image_initial, algo=cv2.THRESH_OTSU)
     th2 = Threshold(roi, algo=cv2.THRESH_OTSU)
@@ -440,13 +422,13 @@ def SeqNCC(TrackX, TrackY, idx, root, DstFolder, GroupIndex, image_name):
     ax_orig.set_title(f'(Image){image_name} ')
     ax_orig.set_axis_off()
 
-    # Plot xy-center
+    # --------Plot xy-center---------------------------------------------------------------------------
     ax_orig.plot(x, y, 'ro', markersize=6)
     # Plot whole track
     ax_orig.plot(TrackX[idx-5:idx+2], TrackY[idx-5:idx+2],
                  'g', marker='.', linewidth="1", markersize=5, alpha=0.8)
 
-    # Plot ROI reference
+    # --------Plot ROI reference------------------------------------------------------------------------
     ax_corr.imshow(roi, cmap="gray")
     ax_corr.set_title(f"(ROI/Template){image_name} ")
     ax_corr.set_axis_off()
@@ -466,14 +448,14 @@ def Track2(SrcFolder, DstFolder, GroupIndex):
     
     first_image_name = sorted(os.listdir(root))[0:1]
 
-    # Return X,Y from first picture
+    # --------Return X,Y from first picture----------------------------------------------------------------
     TrackResult = GetCenter(f"{root}/{''.join(first_image_name)}", GroupIndex)
     # print(f"{root}/{''.join(first_image_name)}")
     TrackX.append(TrackResult[0])
     TrackY.append(TrackResult[1])
     ### print(f"=> TrackX:{TrackX}, TrackY:{TrackY}")
 
-    # Rest sequential image will track by the former image
+    # --------Rest sequential image will track by the former image----------------------------------------
     for image in sorted(os.listdir(root))[1:]:
         # Use previous image as Cross-Correlation
         prev_idx = sorted(os.listdir(root)).index(image) - 1

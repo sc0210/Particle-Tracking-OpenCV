@@ -32,7 +32,7 @@ for index in groups[1:2]:
         # IMG2MP4(SrcFolder, OutFolder, OutName=f'{index}', FPS=5)
 
 #----Step3:Track through ROI-------------------------# 
-for index in groups[1:]:
+for index in groups[5:]:
     _SrcFolder = "./Brownian_motion" # import analysis file
     _DstFolder = "./Export/TrackFile/Reserved" # Saved tracking result by frame
     METHOD = 1
@@ -49,7 +49,7 @@ for index in groups[1:]:
     MSD(X ,Y, FPS, "./Export/TrackFile", GroupIndex=index, ImgShow=True)
     
     if _Export  == True|1:
-        print(f"=> Converting into animation...")
+        #print(f"=> Converting into animation...")
         Src = f"{Root3}/{index}"
         FilenName = f"Track_{index}"
         #IMG2MP4(Src, f"{Root2}/{index}", FilenName, FPS=20)
