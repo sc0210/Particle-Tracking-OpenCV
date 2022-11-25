@@ -32,20 +32,18 @@ for index in groups[1:2]:
         # IMG2MP4(SrcFolder, OutFolder, OutName=f'{index}', FPS=5)
 
 #----Step3:Track through ROI-------------------------# 
-for index in groups[5:]:
-    _SrcFolder = "./Brownian_motion" # import analysis file
-    _DstFolder = "./Export/TrackFile/Reserved" # Saved tracking result by frame
-    METHOD = 1
-    print(f"=> Current method: {METHOD}")
+METHOD = 1; FPS=10
+_SrcFolder = "./Brownian_motion" # import analysis file
+_DstFolder = "./Export/TrackFile/Reserved" # Saved tracking result by frame
 
+for index in groups[:]:
     if METHOD == 1:
-        X,Y = Track(_SrcFolder, _DstFolder, GroupIndex=index, SavePlot=_Plot)   
+        X,Y = Track(_SrcFolder, _DstFolder, GroupIndex=index)   
     elif METHOD == 2:
         X,Y = Track2(_SrcFolder, _DstFolder, GroupIndex=index)
     else:
         print("Please check METHOD")
     
-    FPS=100
     MSD(X ,Y, FPS, "./Export/TrackFile", GroupIndex=index, ImgShow=True)
     
     if _Export  == True|1:
