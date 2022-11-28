@@ -19,10 +19,9 @@ groups = ['1', '2', '3', '4', '5','Free','Laser'] # Named after exp. group
 NUM = len(groups) # 7 experiments in total
 
 EnvSetup(f'./Export')
-for idx in folders:
-    EnvSetup(f'./Export/{idx}') # Create subfolders "RawData", "TrackFile"
+MakeSubFolders(f'./Export', folders) # Create subfolders groups "RawData","TrackFile"
+MakeSubFolders(f'./Brownian_motion', groups) # Create subfolders groups "1", "2","3"...
 MakeSubFolders(f'./Export/TrackFile', subfolders) # Create subfolders "ROI", "GIF", "Plot" ,"Reserved"
-MakeSubFolders(f'./Export/TrackFile/Reserved', groups) # Create subfolders "1", "2","3"...
 
 #----Step2:Convert to animation----------------------#
 for index in groups[1:2]:
