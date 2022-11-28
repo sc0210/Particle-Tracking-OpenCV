@@ -392,9 +392,15 @@ def SeqNCC(TrackX, TrackY, idx, root, DstFolder, GroupIndex, image_name):
         GroupIndex(int):
         image_name(str):
     """
+    nfile=[]
+    files = sorted(os.listdir(root))
+    for x in files:
+        if x.split(".")[1] == "tif":
+           nfile.append(x)
+
     # --------Current analysis image index------------------------------------------------------------
     image_name = image_name.replace(".tif", "")
-    roi_image = sorted(os.listdir(root))[idx]
+    roi_image = nfile[idx]
     roi_initial = np.asarray(cv2.imread(f"{root}/{roi_image}", 0))
     image_initial = np.asarray(cv2.imread(f"{root}/{image_name}.tif", 0))
 
@@ -450,12 +456,9 @@ def Track2(SrcFolder, DstFolder, GroupIndex):
            nfile.append(x)
 
     first_image_name = nfile[0]
-
     # --------Return X,Y from first picture----------------------------------------------------------------
-    print(f"{root}/{''.join(first_image_name)}")
     TrackResult = GetCenter(f"{root}/{''.join(first_image_name)}", GroupIndex)
-    TrackX.append(TrackResult[0])
-    TrackY.append(TrackResult[1])
+    TrackX.append(TrackResult[0]); TrackY.append(TrackResult[1])
     ### print(f"=> TrackX:{TrackX}, TrackY:{TrackY}")
 
     # --------Rest sequential image will track by the former image----------------------------------------
