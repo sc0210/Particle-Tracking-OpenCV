@@ -9,12 +9,14 @@
 
 ## Steps to follow
 1. Organize input data (tif images) by group and store in respective folder 
-```
+
+```text
 Folder_Name_List = ['1', '2', '3', '4', '5','Free','Laser']
 ```
 
 2. Program Setup
-```
+
+```text
 # Step1 Clone this repository to your folder 
 $ git clone https://github.com/sc0210/Particle-Tracking-OpenCV.git
 
@@ -27,6 +29,7 @@ $ pip install -r requirements
 # Step4 Execute main program (data must involve in the same folder path)
 $ python main.py
 ```
+
 3. Analyze done! Check up the result in `./Export`
 
 ## Current updated ***(10/14)***
@@ -64,9 +67,9 @@ $ python main.py
     - MDD(X,Y,OutFolder,filename,length,ImgShow=False)
     ```
  
-- [ ] Part 2 Organized and record the process
+- [x] Part 2 Organized and record the process
   - [x] Github -> *Create this repository!* 
-  - [ ] TA (teaching material, demo code, ppt)
+  - [x] TA (teaching material, demo code, ppt)
 
 ## References 
 1. HoughCircles() (OpenCV document) [https://reurl.cc/0XZbxb]
